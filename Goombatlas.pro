@@ -13,8 +13,16 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp
+        mainwindow.cpp \
+    mapview.cpp \
+    map.cpp \
+    mapobjects.cpp \
+    nodeeditorwidget.cpp
 
-HEADERS  += mainwindow.h
+HEADERS  += mainwindow.h \
+    mapview.h \
+    map.h \
+    mapobjects.h \
+    nodeeditorwidget.h
 
 FORMS    += mainwindow.ui
