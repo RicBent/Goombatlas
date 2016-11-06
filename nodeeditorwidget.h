@@ -8,7 +8,8 @@
 #include <QFrame>
 #include <QLabel>
 #include <QSpinBox>
-#include <QPushButton>
+#include <QComboBox>
+#include <QHash>
 
 class NodeEditorWidget : public QWidget
 {
@@ -30,6 +31,7 @@ private slots:
     void zChanged(int z);
     void areaIdChnaged(int areaId);
     void iconIdChanged(int iconId);
+    void iconChanged(int iconIndex);
 
 private:
     class HorLine : public QFrame { public: HorLine() { setFrameStyle(QFrame::HLine | QFrame::Sunken); } };
@@ -40,6 +42,9 @@ private:
     QSpinBox* zPos;
     QSpinBox* areaId;
     QSpinBox* iconId;
+    QComboBox* icon;
+
+    QHash<quint8, int> iconIndexes;
 
     Map* map;
     Node* editNode;
@@ -48,7 +53,8 @@ private:
     void setEditsEnabled(bool enabled);
     void updateInfo();
     void allowChanges(bool allow);
-    void zeroValues();
+    void clearValues();
+    void loadLevelIcons();
 };
 
 #endif // NODEEDITORWIDGET_H
