@@ -21,6 +21,8 @@ Map::Map(QFile* file)
         {
             if (xmlReader.name() == "nodes")
                 readNodes(&xmlReader);
+            else if (xmlReader.name() == "pathSettings")
+                readPathSettings(&xmlReader);
             else
                 xmlReader.readNext();
         }
@@ -35,6 +37,9 @@ Map::~Map()
 {
     foreach (Node* n, nodes)
         delete n;
+
+    foreach (PathBehavior* p, pathBehaviors)
+        delete p;
 }
 
 void Map::readNodes(QXmlStreamReader* xmlReader)
@@ -50,6 +55,24 @@ void Map::readNodes(QXmlStreamReader* xmlReader)
         {
             if (xmlReader->name() == "node")
                 addNode(new Node(xmlReader));
+        }
+        xmlReader->readNext();
+    }
+}
+
+void Map::readPathSettings(QXmlStreamReader* xmlReader)
+{
+    while (!xmlReader->atEnd())
+    {
+        if(xmlReader->isEndElement())
+        {
+            xmlReader->readNext();
+            break;
+        }
+        else if(xmlReader->isStartElement())
+        {
+            if (xmlReader->name() == "pathSetting")
+                addPathBehavior(new PathBehavior(xmlReader));
         }
         xmlReader->readNext();
     }
@@ -78,6 +101,11 @@ bool Map::save(QWidget* parent, QString path)
         xmlWriter.writeStartElement("nodes");
         foreach (Node* n, nodes)
             n->writeXml(&xmlWriter);
+        xmlWriter.writeEndElement();
+
+        xmlWriter.writeStartElement("pathSettings");
+        foreach (PathBehavior* p, pathBehaviors)
+            p->writeXml(&xmlWriter);
         xmlWriter.writeEndElement();
 
     xmlWriter.writeEndElement();
@@ -126,4 +154,44 @@ void Map::moveNodeDown(int index)
         return;
 
     nodes.move(index, index+1);
+}
+
+
+PathBehavior* Map::getPathBehaviorPtr(int index)
+{
+    return pathBehaviors.at(index);
+}
+
+void Map::addPathBehavior(PathBehavior* pathBehavior, int index)
+{
+    if (index == -1)
+        pathBehaviors.append(pathBehavior);
+    else
+        pathBehaviors.insert(index, pathBehavior);
+}
+
+void Map::removePathBehavior(int index)
+{
+    pathBehaviors.removeAt(index);
+}
+
+void Map::removePathBehavior(PathBehavior* pathBehavior)
+{
+    pathBehaviors.removeOne(pathBehavior);
+}
+
+void Map::movePathBehaviorUp(int index)
+{
+    if (index <= 0)
+        return;
+
+    pathBehaviors.move(index, index-1);
+}
+
+void Map::movePathBehaviorDown(int index)
+{
+    if (index >= pathBehaviors.length()-1)
+        return;
+
+    pathBehaviors.move(index, index+1);
 }

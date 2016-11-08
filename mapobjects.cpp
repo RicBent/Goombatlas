@@ -103,4 +103,83 @@ void Node::writeXml(QXmlStreamWriter* xmlWriter)
     xmlWriter->writeTextElement("cameraScrollSecret", QString::number(cameraScrollSecret));
     xmlWriter->writeTextElement("unk0", QString::number(unk0));
     xmlWriter->writeTextElement("unk1", QString::number(unk1));
+    xmlWriter->writeEndElement();
+}
+
+int Node::getBowserJrPath()
+{
+    bool tower = (settings & 0x2) != 0;
+    bool castle = (settings & 0x4) != 0;
+    bool tower2 = (settings & 0x20) != 0;
+    bool castle2 = (settings & 0x40) != 0;
+
+    if (tower && !castle && !tower2 && !castle2)
+        return 1;
+    else if (!tower && castle && !tower2 && !castle2)
+        return 2;
+    else if (!tower && !castle && tower2 && !castle2)
+        return 3;
+    else if (!tower && !castle && !tower2 && castle2)
+        return 4;
+    else
+        return 0;
+}
+
+void Node::setBowserJrPath(int index)
+{
+    settings &= 0x99;
+    if (index == 1)
+        settings |= 0x2;
+    else if (index == 2)
+        settings |= 0x4;
+    else if (index == 3)
+        settings |= 0x20;
+    else if (index == 4)
+        settings |= 0x40;
+}
+
+
+PathBehavior::PathBehavior()
+{
+    clearValues();
+}
+
+PathBehavior::PathBehavior(QXmlStreamReader *xmlReader)
+{
+    clearValues();
+
+    while (!xmlReader->atEnd())
+    {
+        if(xmlReader->isEndElement())
+        {
+            xmlReader->readNext();
+            break;
+        }
+        else if(xmlReader->isStartElement())
+        {
+            if (xmlReader->name() == "animationId")
+                animationId = xmlReader->readElementText().toInt();
+            else if (xmlReader->name() == "starCoinCost")
+                starCoinCost = xmlReader->readElementText().toInt();
+            else if (xmlReader->name() == "settings")
+                settings = xmlReader->readElementText().toInt();
+        }
+        xmlReader->readNext();
+    }
+}
+
+void PathBehavior::clearValues()
+{
+    animationId = 0;
+    starCoinCost = 0;
+    settings = 0;
+}
+
+void PathBehavior::writeXml(QXmlStreamWriter *xmlWriter)
+{
+    xmlWriter->writeStartElement("pathSetting");
+    xmlWriter->writeTextElement("animationId", QString::number(animationId));
+    xmlWriter->writeTextElement("starCoinCost", QString::number(starCoinCost));
+    xmlWriter->writeTextElement("settings", QString::number(settings));
+    xmlWriter->writeEndElement();
 }

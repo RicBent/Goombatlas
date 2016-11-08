@@ -17,12 +17,14 @@ SOURCES += main.cpp\
     mapview.cpp \
     map.cpp \
     mapobjects.cpp \
-    nodeeditorwidget.cpp
+    nodeeditorwidget.cpp \
+    pathbehavioreditor.cpp
 
 HEADERS  += mainwindow.h \
     mapview.h \
     map.h \
     mapobjects.h \
-    nodeeditorwidget.h
+    nodeeditorwidget.h \
+    pathbehavioreditor.h
 
 FORMS    += mainwindow.ui
