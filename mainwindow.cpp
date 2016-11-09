@@ -35,15 +35,19 @@ MainWindow::MainWindow(QWidget *parent) :
 
     map = new Map();
 
+    mapViewArea = new QScrollAreaRE();
+    ui->mainLayout->addWidget(mapViewArea);
+
     mapView = new MapView(this, map);
     connect(mapView, SIGNAL(scrollTo(int,int)), this, SLOT(mapScrollTo(int,int)));
     connect(mapView, SIGNAL(scrollTo(QPoint)), this, SLOT(mapScrollTo(QPoint)));
-    ui->mapViewArea->setWidget(mapView);
+    mapViewArea->setWidget(mapView);
+    connect(mapViewArea, SIGNAL(resized(QResizeEvent*)), mapView, SLOT(viewAreaResized(QResizeEvent*)));
 
 
     // Setup Node Editor
 
-    nodeEditor = new NodeEditorWidget(map, this);
+    nodeEditor = new NodeEditorWidget(map, mapView, this);
     connect(nodeEditor, SIGNAL(redrawMap()), mapView, SLOT(update()));
 
     QDockWidget* nodeEditorDock = new QDockWidget("Node Editor", this);
@@ -124,8 +128,8 @@ void MainWindow::mapScrollTo(int x, int y)
     int wR = mapView->visibleRegion().boundingRect().width();
     int hR = mapView->visibleRegion().boundingRect().height();
 
-    ui->mapViewArea->horizontalScrollBar()->setValue(qMax((int)((x+mapView->getCenterX())*zoom)-wR/2, 0));
-    ui->mapViewArea->verticalScrollBar()->setValue(qMax((int)((y+mapView->getCenterY())*zoom)-hR/2, 0));
+    mapViewArea->horizontalScrollBar()->setValue(qMax((int)((x+mapView->getCenterX())*zoom)-wR/2, 0));
+    mapViewArea->verticalScrollBar()->setValue(qMax((int)((y+mapView->getCenterY())*zoom)-hR/2, 0));
 }
 
 void MainWindow::on_actionNew_triggered()

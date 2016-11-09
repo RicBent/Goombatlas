@@ -2,6 +2,7 @@
 
 #include <QPaintEvent>
 #include <QPainter>
+#include <QResizeEvent>
 
 MapView::MapView(QWidget *parent, Map *map) : QWidget(parent)
 {
@@ -18,6 +19,15 @@ MapView::MapView(QWidget *parent, Map *map) : QWidget(parent)
 MapView::~MapView()
 {
 
+}
+
+void MapView::viewAreaResized(QResizeEvent* evt)
+{
+    float wdiff = evt->size().width() - evt->oldSize().width();
+    float hdiff = evt->size().height() - evt->oldSize().height();
+
+    QPoint wrongPos = getCurrentPos();
+    emit scrollTo(QPoint(wrongPos.x() - wdiff/(2*zoom), wrongPos.y() - hdiff/(2*zoom)));
 }
 
 void MapView::setZoom(float zoom)
@@ -37,17 +47,19 @@ void MapView::setZoom(float zoom)
 
 void MapView::zoomIn()
 {
-    setZoom(zoom+0.25);
+    if (zoom < 3.5)
+        setZoom(zoom+0.25);
 }
 
 void MapView::zoomOut()
 {
-    setZoom(zoom+0.25);
+    if (zoom > 0.75)
+        setZoom(zoom-0.25);
 }
 
 void MapView::zoomMax()
 {
-    setZoom(2);
+    setZoom(3.5);
 }
 
 void MapView::zoomMin()
@@ -72,8 +84,6 @@ void MapView::paintEvent(QPaintEvent* evt)
     painter.scale(zoom,zoom);
 
     QRect drawrect = QRect(evt->rect().x()/zoom, evt->rect().y()/zoom, evt->rect().width()/zoom+20, evt->rect().height()/zoom+20);
-
-    //qDebug("draw %d,%d %d,%d", drawrect.x(), drawrect.y(), drawrect.width(), drawrect.height());
 
     painter.fillRect(drawrect, QColor(119,136,153));
 
@@ -125,15 +135,13 @@ void MapView::paintEvent(QPaintEvent* evt)
         else
             nodePixmap = QPixmap(nodesPath + "normal.png");
 
+        /*if (!n->getSetting(3))
+        {
+            Draw some different node if node not visible?
+        }*/
+
         painter.drawPixmap(nodeRect, nodePixmap);
     }
-}
-
-void MapView::resizeEvent(QResizeEvent* evt)
-{
-    QPoint p = getCurrentPos();
-    QWidget::resizeEvent(evt);
-    emit scrollTo(p);
 }
 
 int MapView::roundDown(int num, int factor)

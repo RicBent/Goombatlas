@@ -2,6 +2,7 @@
 #define NODEEDITORWIDGET_H
 
 #include "map.h"
+#include "mapview.h"
 
 #include <QWidget>
 #include <QListWidget>
@@ -16,7 +17,7 @@ class NodeEditorWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit NodeEditorWidget(Map* map, QWidget* parent = 0);
+    explicit NodeEditorWidget(Map* map, MapView* mapView, QWidget* parent = 0);
     void select(Node* node);
     void deselect();
     void setMap(Map* map);
@@ -61,6 +62,7 @@ private:
     QHash<quint8, int> iconIndexes;
 
     Map* map;
+    MapView* mapView;
     Node* editNode;
 
     void updateList();

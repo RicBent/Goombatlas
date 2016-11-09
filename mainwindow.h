@@ -8,10 +8,28 @@
 #include <QMainWindow>
 #include <QCoreApplication>
 #include <QSettings>
+#include <QScrollArea>
+#include <QResizeEvent>
 
 namespace Ui {
 class MainWindow;
 }
+
+class QScrollAreaRE : public QScrollArea
+{
+    Q_OBJECT
+public:
+    QScrollAreaRE() {}
+    virtual ~QScrollAreaRE() {}
+signals:
+    void resized(QResizeEvent* evt);
+protected:
+    void resizeEvent(QResizeEvent* evt)
+    {
+        QScrollArea::resizeEvent(evt);
+        emit resized(evt);
+    }
+};
 
 class MainWindow : public QMainWindow
 {
@@ -55,6 +73,7 @@ private:
 
     Map* map;
     MapView* mapView;
+    QScrollAreaRE* mapViewArea;
     NodeEditorWidget* nodeEditor;
     PathBehaviorEditor* pathBehaviorEditor;
 

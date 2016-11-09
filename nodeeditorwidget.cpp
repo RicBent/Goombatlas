@@ -9,9 +9,10 @@
 
 #include <QDebug>
 
-NodeEditorWidget::NodeEditorWidget(Map* map, QWidget* parent) : QWidget(parent)
+NodeEditorWidget::NodeEditorWidget(Map* map, MapView *mapView, QWidget* parent) : QWidget(parent)
 {
     this->map = map;
+    this->mapView = mapView;
 
     QString iconsPath(QCoreApplication::applicationDirPath() + "/goombatlas_data/icons/");
 
@@ -287,7 +288,9 @@ void NodeEditorWidget::nodeListIndexChanged(int index)
 
 void NodeEditorWidget::addNodeClicked()
 {
-    Node* newNode = new Node(0, 0, 0);
+    QPoint currPos = mapView->getCurrentPos();
+
+    Node* newNode = new Node(currPos.x(), 0, currPos.y());
 
     int insertIndex = -1;
     if (nodeList->currentIndex().row() != -1)

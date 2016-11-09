@@ -25,13 +25,17 @@ public:
     int getCenterX() { return centerX; }
     int getCenterY() { return centerY; }
 
+    QPoint getCurrentPos();
+
 signals:
     void scrollTo(int x, int y);
     void scrollTo(QPoint p);
 
+public slots:
+    void viewAreaResized(QResizeEvent* evt);
+
 protected:
     void paintEvent(QPaintEvent *) Q_DECL_OVERRIDE;
-    void resizeEvent(QResizeEvent *) Q_DECL_OVERRIDE;
 
 private:
     Map *map;
@@ -43,8 +47,9 @@ private:
     int centerX;
     int centerY;
 
-    QPoint getCurrentPos();
     int roundDown(int num, int factor);
+
+    QPoint tempPos;
 };
 
 #endif // MAPVIEW_H
