@@ -24,6 +24,8 @@ public:
     void setwidth(quint32 width) { this->width = width; }
     void setheight(quint32 height) { this->height = height; }
 
+    bool clickDetection(int x, int y);
+
 protected:
     qint32 x, y, z;
     qint32 width, height;   // For click detection and rendering
@@ -49,6 +51,7 @@ public:
     Node();
     Node(qint32 x, qint32 y, qint32 z);
     Node(QXmlStreamReader* xmlReader);
+    ~Node();
 
     void writeXml(QXmlStreamWriter* xmlWriter);
 
@@ -68,9 +71,11 @@ public:
     void setUnk0(quint8 unk0) { this->unk0 = unk0; }
     void setUnk1(quint8 unk1) { this->unk1 = unk1; }
 
+    QList<Path*> *pathList() { return &paths; }
+
 private:
     // Data Node
-    QList<Path> paths;
+    QList<Path*> paths;
     quint8 areaId;
     quint8 iconId;
     quint8 settings;

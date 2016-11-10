@@ -49,6 +49,10 @@ MainWindow::MainWindow(QWidget *parent) :
 
     nodeEditor = new NodeEditorWidget(map, mapView, this);
     connect(nodeEditor, SIGNAL(redrawMap()), mapView, SLOT(update()));
+    connect(mapView, SIGNAL(changeSelectedNode(Node*)), nodeEditor, SLOT(select(Node*)));
+    connect(mapView, SIGNAL(changeDeselectedNode()), nodeEditor, SLOT(deselect()));
+    connect(nodeEditor, SIGNAL(nodeSelected(Node*)), mapView, SLOT(selectNode(Node*)));
+    connect(nodeEditor, SIGNAL(nodeDeselected()), mapView, SLOT(deselectNode()));
 
     QDockWidget* nodeEditorDock = new QDockWidget("Node Editor", this);
     nodeEditorDock->setWidget(nodeEditor);

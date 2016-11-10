@@ -9,6 +9,12 @@ MovableObject::MovableObject()
     height = 0;
 }
 
+bool MovableObject::clickDetection(int x, int y)
+{
+    QRect rect(this->x-this->width/2, this->z-this->height/2, this->width, this->height);
+    return rect.contains(x, y);
+}
+
 Node::Node()
 {
     clearValues();
@@ -67,9 +73,54 @@ Node::Node(QXmlStreamReader* xmlReader)
                 cameraScroll = xmlReader->readElementText().toUInt();
             else if (xmlReader->name() == "cameraScrollSecret")
                 cameraScrollSecret = xmlReader->readElementText().toUInt();
+
+            else if (xmlReader->name() == "paths")
+            {
+                while (!xmlReader->atEnd())
+                {
+                    if(xmlReader->isEndElement())
+                    {
+                        xmlReader->readNext();
+                        break;
+                    }
+                    else if(xmlReader->isStartElement())
+                    {
+                        if (xmlReader->name() == "path")
+                        {
+                            Path* p = new Path();
+                            while (!xmlReader->atEnd())
+                            {
+                                if(xmlReader->isEndElement())
+                                {
+                                    xmlReader->readNext();
+                                    break;
+                                }
+                                else if(xmlReader->isStartElement())
+                                {
+                                    if (xmlReader->name() == "endNodeId")
+                                        p->endingNodeId = xmlReader->readElementText().toUInt();
+                                    else if (xmlReader->name() == "pathSettingId")
+                                        p->animationId = xmlReader->readElementText().toUInt();
+                                    else if (xmlReader->name() == "settings")
+                                        p->settings = xmlReader->readElementText().toUInt();
+                                }
+                                xmlReader->readNext();
+                            }
+                            paths.append(p);
+                        }
+                    }
+                    xmlReader->readNext();
+                }
+            }
         }
         xmlReader->readNext();
     }
+}
+
+Node::~Node()
+{
+    foreach (Path* p, paths)
+        delete p;
 }
 
 void Node::clearValues()
@@ -77,6 +128,8 @@ void Node::clearValues()
     this->x = 0;
     this->y = 0;
     this->z = 0;
+    this->width = 20;
+    this->height = 20;
     this->areaId = 0;
     this->iconId = 0;
     this->settings = 0;
@@ -91,6 +144,7 @@ void Node::clearValues()
 void Node::writeXml(QXmlStreamWriter* xmlWriter)
 {
     xmlWriter->writeStartElement("node");
+
     xmlWriter->writeTextElement("x", QString::number(x));
     xmlWriter->writeTextElement("y", QString::number(y));
     xmlWriter->writeTextElement("z", QString::number(z));
@@ -103,6 +157,18 @@ void Node::writeXml(QXmlStreamWriter* xmlWriter)
     xmlWriter->writeTextElement("cameraScrollSecret", QString::number(cameraScrollSecret));
     xmlWriter->writeTextElement("unk0", QString::number(unk0));
     xmlWriter->writeTextElement("unk1", QString::number(unk1));
+
+    xmlWriter->writeStartElement("paths");
+    foreach (Path* p, paths)
+    {
+         xmlWriter->writeStartElement("path");
+         xmlWriter->writeTextElement("endNodeId", QString::number(p->endingNodeId));
+         xmlWriter->writeTextElement("pathSettingId", QString::number(p->animationId));
+         xmlWriter->writeTextElement("settings", QString::number(p->settings));
+         xmlWriter->writeEndElement();
+    }
+    xmlWriter->writeEndElement();
+
     xmlWriter->writeEndElement();
 }
 

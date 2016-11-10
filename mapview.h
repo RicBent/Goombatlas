@@ -22,6 +22,8 @@ public:
     void zoomMin();
     void toggleGrid(bool toggle) { showGrid = toggle; repaint(); }
 
+    void setNodeWidth(int width);
+
     int getCenterX() { return centerX; }
     int getCenterY() { return centerY; }
 
@@ -30,15 +32,29 @@ public:
 signals:
     void scrollTo(int x, int y);
     void scrollTo(QPoint p);
+    void changeSelectedNode(Node* node);
+    void changeDeselectedNode();
 
 public slots:
     void viewAreaResized(QResizeEvent* evt);
+    void selectNode(Node* node);
+    void deselectNode();
 
 protected:
     void paintEvent(QPaintEvent *) Q_DECL_OVERRIDE;
+    void mousePressEvent(QMouseEvent *) Q_DECL_OVERRIDE;
+    void mouseMoveEvent(QMouseEvent *) Q_DECL_OVERRIDE;
+    void mouseReleaseEvent(QMouseEvent *) Q_DECL_OVERRIDE;
 
 private:
-    Map *map;
+    Map* map;
+
+    Node* selectedNode;
+    bool nodeSelected;
+
+    bool drag;
+    int dragX, dragY;
+    int lastX, lastY;
 
     float zoom;
     bool showGrid;
@@ -50,6 +66,13 @@ private:
     int roundDown(int num, int factor);
 
     QPoint tempPos;
+
+    QPointF rotateArroundPoint(QPointF point, QPointF center, float angle);
+
+    int round(int number, int multiple)
+    {
+        return (number + (multiple / 2)) / multiple * multiple;
+    }
 };
 
 #endif // MAPVIEW_H
