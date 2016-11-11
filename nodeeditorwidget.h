@@ -58,6 +58,17 @@ private slots:
     void directionChanged(int direction);
     void reversePathAnimToggled(bool toggle);
 
+    void unlockedPath0Chnaged(int id);
+    void unlockedPath1Chnaged(int id);
+    void unlockedPath2Chnaged(int id);
+    void unlockedPath3Chnaged(int id);
+    void cameraScrollNodeChnaged(int id);
+    void sUnlockedPath0Chnaged(int id);
+    void sUnlockedPath1Chnaged(int id);
+    void sUnlockedPath2Chnaged(int id);
+    void sUnlockedPath3Chnaged(int id);
+    void sCameraScrollNodeChnaged(int id);
+
 private:
     class HorLine : public QFrame { public: HorLine() { setFrameStyle(QFrame::HLine | QFrame::Sunken); } };
 
@@ -73,6 +84,18 @@ private:
     QCheckBox* hasStarCoins;
     QCheckBox* goToNextWorld;
     QCheckBox* unknownBit;
+
+    QSpinBox* unlockedPath0;
+    QSpinBox* unlockedPath1;
+    QSpinBox* unlockedPath2;
+    QSpinBox* unlockedPath3;
+    QSpinBox* cameraScrollNode;
+    QSpinBox* sUnlockedPath0;
+    QSpinBox* sUnlockedPath1;
+    QSpinBox* sUnlockedPath2;
+    QSpinBox* sUnlockedPath3;
+    QSpinBox* sCameraScrollNode;
+
 
     QListWidget* pathList;
     QToolBar* pButtonsBar;

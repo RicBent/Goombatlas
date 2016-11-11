@@ -13,6 +13,7 @@ public:
     QString getPath() { return path; }
 
     bool save(QWidget* parent, QString path="");
+    void exportAsC(QString cFilePath, QString rFilePath, QString prefix, int worldId);
 
     QList<Node*> nodes;
     QList<PathBehavior*> pathBehaviors;
@@ -36,6 +37,8 @@ public:
 
 private:
     QString path;
+
+    QString hex(uint addr);
 };
 
 #endif // MAP_H

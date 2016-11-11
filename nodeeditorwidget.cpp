@@ -7,6 +7,8 @@
 #include <QAction>
 #include <QTabWidget>
 #include <QSpacerItem>
+#include <QGroupBox>
+#include <QSpacerItem>
 
 #include <QDebug>
 
@@ -141,7 +143,7 @@ NodeEditorWidget::NodeEditorWidget(Map* map, MapView *mapView, QWidget* parent) 
     tabWidget->addTab(pathsTab, "Paths");
 
     pathList = new QListWidget(this);
-    pathList->setMaximumHeight(100);
+    pathList->setMaximumHeight(110);
     pathList->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
     connect(pathList, SIGNAL(currentRowChanged(int)), this, SLOT(pathListIndexChanged(int)));
     pathsLayout->addWidget(pathList);
@@ -199,6 +201,96 @@ NodeEditorWidget::NodeEditorWidget(Map* map, MapView *mapView, QWidget* parent) 
 
     pathsLayout->addLayout(pathEditsLayout);
 
+
+    QVBoxLayout* unlocksLayout = new QVBoxLayout();
+    QWidget* unlocksTab = new QWidget(this);
+    unlocksTab->setLayout(unlocksLayout);
+    tabWidget->addTab(unlocksTab, "Unlocks");
+
+    QGroupBox* normalExit = new QGroupBox("Normal Exit", this);
+    QGridLayout* neLayout = new QGridLayout();
+    normalExit->setLayout(neLayout);
+
+    neLayout->addWidget(new QLabel("Unlocked Path Settings:"), 0, 0, 1, 4);
+    neLayout->addWidget(new QLabel("#0"), 1, 0);
+    unlockedPath0 = new QSpinBox(this);
+    unlockedPath0->setRange(0, 255);
+    unlockedPath0->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    connect(unlockedPath0, SIGNAL(valueChanged(int)), this, SLOT(unlockedPath0Chnaged(int)));
+    neLayout->addWidget(unlockedPath0, 1, 1);
+    neLayout->addWidget(new QLabel("#1"), 1, 2);
+    unlockedPath1 = new QSpinBox(this);
+    unlockedPath1->setRange(0, 255);
+    unlockedPath1->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    connect(unlockedPath1, SIGNAL(valueChanged(int)), this, SLOT(unlockedPath1Chnaged(int)));
+    neLayout->addWidget(unlockedPath1, 1, 3);
+    neLayout->addWidget(new QLabel("#2"), 2, 0);
+    unlockedPath2 = new QSpinBox(this);
+    unlockedPath2->setRange(0, 255);
+    connect(unlockedPath2, SIGNAL(valueChanged(int)), this, SLOT(unlockedPath2Chnaged(int)));
+    neLayout->addWidget(unlockedPath2, 2, 1);
+    neLayout->addWidget(new QLabel("#3"), 2, 2);
+    unlockedPath3 = new QSpinBox(this);
+    unlockedPath3->setRange(0, 255);
+    connect(unlockedPath3, SIGNAL(valueChanged(int)), this, SLOT(unlockedPath3Chnaged(int)));
+    neLayout->addWidget(unlockedPath3, 2, 3);
+
+    neLayout->addWidget(new HorLine(), 3, 0, 1, 4);
+
+    QHBoxLayout* neLayoutSub = new QHBoxLayout();
+    neLayout->addLayout(neLayoutSub, 4, 0, 1, 4);
+    neLayoutSub->addWidget(new QLabel("Scroll To Node:"));
+    cameraScrollNode = new QSpinBox(this);
+    cameraScrollNode->setRange(0, 65535);
+    cameraScrollNode->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    connect(cameraScrollNode, SIGNAL(valueChanged(int)), this, SLOT(cameraScrollNodeChnaged(int)));
+    neLayoutSub->addWidget(cameraScrollNode);
+
+    unlocksLayout->addWidget(normalExit);
+
+
+    QGroupBox* secretExit = new QGroupBox("Secret Exit", this);
+    QGridLayout* seLayout = new QGridLayout();
+    secretExit->setLayout(seLayout);
+
+    seLayout->addWidget(new QLabel("Unlocked Path Settings:"), 0, 0, 1, 4);
+    seLayout->addWidget(new QLabel("#0"), 1, 0);
+    sUnlockedPath0 = new QSpinBox(this);
+    sUnlockedPath0->setRange(0, 255);
+    sUnlockedPath0->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    connect(sUnlockedPath0, SIGNAL(valueChanged(int)), this, SLOT(sUnlockedPath0Chnaged(int)));
+    seLayout->addWidget(sUnlockedPath0, 1, 1);
+    seLayout->addWidget(new QLabel("#1"), 1, 2);
+    sUnlockedPath1 = new QSpinBox(this);
+    sUnlockedPath1->setRange(0, 255);
+    sUnlockedPath1->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    connect(sUnlockedPath1, SIGNAL(valueChanged(int)), this, SLOT(sUnlockedPath1Chnaged(int)));
+    seLayout->addWidget(sUnlockedPath1, 1, 3);
+    seLayout->addWidget(new QLabel("#2"), 2, 0);
+    sUnlockedPath2 = new QSpinBox(this);
+    sUnlockedPath2->setRange(0, 255);
+    connect(sUnlockedPath2, SIGNAL(valueChanged(int)), this, SLOT(sUnlockedPath2Chnaged(int)));
+    seLayout->addWidget(sUnlockedPath2, 2, 1);
+    seLayout->addWidget(new QLabel("#3"), 2, 2);
+    sUnlockedPath3 = new QSpinBox(this);
+    sUnlockedPath3->setRange(0, 255);
+    connect(sUnlockedPath3, SIGNAL(valueChanged(int)), this, SLOT(sUnlockedPath3Chnaged(int)));
+    seLayout->addWidget(sUnlockedPath3, 2, 3);
+
+    seLayout->addWidget(new HorLine(), 3, 0, 1, 4);
+
+    QHBoxLayout* seLayoutSub = new QHBoxLayout();
+    seLayout->addLayout(seLayoutSub, 4, 0, 1, 4);
+    seLayoutSub->addWidget(new QLabel("Scroll To Node:"));
+    sCameraScrollNode = new QSpinBox(this);
+    sCameraScrollNode->setRange(0, 65535);
+    sCameraScrollNode->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    connect(sCameraScrollNode, SIGNAL(valueChanged(int)), this, SLOT(sCameraScrollNodeChnaged(int)));
+    seLayoutSub->addWidget(sCameraScrollNode);
+
+    unlocksLayout->addWidget(secretExit);
+
+    unlocksLayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding));
 
     this->setLayout(layout);
 
@@ -293,6 +385,17 @@ void NodeEditorWidget::setEditsEnabled(bool enabled)
     hasStarCoins->setEnabled(enabled);
     goToNextWorld->setEnabled(enabled);
     unknownBit->setEnabled(enabled);
+
+    unlockedPath0->setEnabled(enabled);
+    unlockedPath1->setEnabled(enabled);
+    unlockedPath2->setEnabled(enabled);
+    unlockedPath3->setEnabled(enabled);
+    cameraScrollNode->setEnabled(enabled);
+    sUnlockedPath0->setEnabled(enabled);
+    sUnlockedPath1->setEnabled(enabled);
+    sUnlockedPath2->setEnabled(enabled);
+    sUnlockedPath3->setEnabled(enabled);
+    sCameraScrollNode->setEnabled(enabled);
 }
 
 void NodeEditorWidget::updateInfo()
@@ -309,6 +412,17 @@ void NodeEditorWidget::updateInfo()
     hasStarCoins->setChecked(editNode->getSetting(0));
     goToNextWorld->setChecked(editNode->getSetting(4));
     unknownBit->setChecked(editNode->getSetting(7));
+
+    unlockedPath0->setValue(editNode->getUnlock(0));
+    unlockedPath1->setValue(editNode->getUnlock(1));
+    unlockedPath2->setValue(editNode->getUnlock(2));
+    unlockedPath3->setValue(editNode->getUnlock(3));
+    cameraScrollNode->setValue(editNode->getCameraScroll());
+    sUnlockedPath0->setValue(editNode->getUnlockSecret(0));
+    sUnlockedPath1->setValue(editNode->getUnlockSecret(1));
+    sUnlockedPath2->setValue(editNode->getUnlockSecret(2));
+    sUnlockedPath3->setValue(editNode->getUnlockSecret(3));
+    sCameraScrollNode->setValue(editNode->getCameraScrollSecret());
     allowChanges(true);
 }
 
@@ -325,6 +439,16 @@ void NodeEditorWidget::allowChanges(bool allow)
     hasStarCoins->blockSignals(!allow);
     goToNextWorld->blockSignals(!allow);
     unknownBit->blockSignals(!allow);
+    unlockedPath0->blockSignals(!allow);
+    unlockedPath1->blockSignals(!allow);
+    unlockedPath2->blockSignals(!allow);
+    unlockedPath3->blockSignals(!allow);
+    cameraScrollNode->blockSignals(!allow);
+    sUnlockedPath0->blockSignals(!allow);
+    sUnlockedPath1->blockSignals(!allow);
+    sUnlockedPath2->blockSignals(!allow);
+    sUnlockedPath3->blockSignals(!allow);
+    sCameraScrollNode->blockSignals(!allow);
 }
 
 void NodeEditorWidget::clearValues()
@@ -342,6 +466,16 @@ void NodeEditorWidget::clearValues()
     hasStarCoins->setChecked(false);
     goToNextWorld->setChecked(false);
     unknownBit->setChecked(false);
+    unlockedPath0->setValue(0);
+    unlockedPath1->setValue(0);
+    unlockedPath2->setValue(0);
+    unlockedPath3->setValue(0);
+    cameraScrollNode->setValue(0);
+    sUnlockedPath0->setValue(0);
+    sUnlockedPath1->setValue(0);
+    sUnlockedPath2->setValue(0);
+    sUnlockedPath3->setValue(0);
+    sCameraScrollNode->setValue(0);
     allowChanges(true);
 }
 
@@ -596,6 +730,56 @@ void NodeEditorWidget::unknownBitToggled(bool toggle)
     editNode->setSetting(toggle, 7);
     updateList();
     emit redrawMap();
+}
+
+void NodeEditorWidget::unlockedPath0Chnaged(int id)
+{
+    editNode->setUnlock(0, id);
+}
+
+void NodeEditorWidget::unlockedPath1Chnaged(int id)
+{
+    editNode->setUnlock(1, id);
+}
+
+void NodeEditorWidget::unlockedPath2Chnaged(int id)
+{
+    editNode->setUnlock(2, id);
+}
+
+void NodeEditorWidget::unlockedPath3Chnaged(int id)
+{
+    editNode->setUnlock(3, id);
+}
+
+void NodeEditorWidget::cameraScrollNodeChnaged(int id)
+{
+    editNode->setCameraScroll(id);
+}
+
+void NodeEditorWidget::sUnlockedPath0Chnaged(int id)
+{
+    editNode->setUnlockSecret(0, id);
+}
+
+void NodeEditorWidget::sUnlockedPath1Chnaged(int id)
+{
+    editNode->setUnlockSecret(1, id);
+}
+
+void NodeEditorWidget::sUnlockedPath2Chnaged(int id)
+{
+    editNode->setUnlockSecret(2, id);
+}
+
+void NodeEditorWidget::sUnlockedPath3Chnaged(int id)
+{
+    editNode->setUnlockSecret(3, id);
+}
+
+void NodeEditorWidget::sCameraScrollNodeChnaged(int id)
+{
+    editNode->setCameraScrollSecret(id);
 }
 
 

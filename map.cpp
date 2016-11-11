@@ -1,4 +1,5 @@
 #include "map.h"
+#include "cstreamwriter.h"
 
 #include <QMessageBox>
 
@@ -116,6 +117,115 @@ bool Map::save(QWidget* parent, QString path)
     return true;
 }
 
+void Map::exportAsC(QString cFilePath, QString rFilePath, QString prefix, int worldId)
+{
+    QFile cFile(cFilePath);
+    if (!cFile.open(QFile::WriteOnly | QFile::Truncate))
+    {
+        QMessageBox::information(NULL, "Goombatlas", "Could not open or create " + cFilePath + " for writing!", QMessageBox::Ok);
+        return;
+    }
+
+    QFile rFile(rFilePath);
+    if (!rFile.open(QFile::ReadOnly))
+    {
+        QMessageBox::information(NULL, "Goombatlas", "Could not open or create " + rFilePath + " for reading!", QMessageBox::Ok);
+        return;
+    }
+
+
+    // Write C File
+
+    CStreamWriter cWriter(&cFile);
+
+    cWriter.writeInclude("worldmap.h");
+    cWriter.writeEndl();
+    cWriter.writeNodes(&nodes, prefix);
+    cWriter.writeEndl();
+    cWriter.writeVisibleNodes(&nodes, prefix);
+    cWriter.writeEndl();
+    cWriter.writePathBehaviors(&pathBehaviors, prefix);
+
+    cFile.close();
+
+
+    // Write Replaces File
+
+    QTextStream rIn(&rFile);
+    QList<QString> lines;
+
+    bool ignoreLine = false;
+    bool ignoredLine = false;
+
+    while(!rIn.atEnd())
+    {
+        QString line = rIn.readLine();
+
+        if (ignoredLine)
+        {
+            ignoredLine = false;
+            if (line == "")
+                continue;
+        }
+
+        if (line.startsWith(QString("@ goombatlas_map_%1_end").arg(worldId)))
+        {
+            ignoreLine = false;
+            ignoredLine = true;
+            continue;
+        }
+
+        if (ignoreLine)
+            continue;
+
+        if (line.startsWith(QString("@ goombatlas_map_%1 - Do not modify these comments and replaces!").arg(worldId)))
+        {
+            ignoreLine = true;
+            continue;
+        }
+
+        lines.append(line);
+    }
+
+    if (lines.length() != 0)
+    {
+        if (lines[lines.length() - 1] == "")
+            lines.removeAt(lines.length() - 1);
+    }
+
+    lines.append("");
+    lines.append(QString("@ goombatlas_map_%1 - Do not modify these comments and replaces!").arg(worldId));
+
+    uint worldOffset = 0x20E79C4 + (worldId-1)*0x28;
+    lines.append(hex(worldOffset) + "_ov_08: " + prefix + "_nodes");
+    lines.append(hex(worldOffset+0x4) + "_ov_08: " + prefix + "_pathBehaviors");
+    // Red Flying Block / Hammer Bros.
+    lines.append(hex(worldOffset+0xC) + "_ov_08: " + prefix + "_visibleNodes");
+    // Star Coin Signs
+    // Towers/Castles
+    // Mushroom Houses
+    // Bowser Jr. Paths
+    uint counts = nodes.count() & 0xFFFF;
+    counts |= pathBehaviors.count() << 16;
+    lines.append(hex(worldOffset+0x20) + "_ov_08: 0x" + hex(counts));
+
+    lines.append(QString("@ goombatlas_map_%1_end").arg(worldId));
+
+    rFile.close();
+    if (!rFile.open(QFile::WriteOnly | QFile::Truncate))
+    {
+        QMessageBox::information(NULL, "Goombatlas", "Could not open " + rFilePath + " for writing!", QMessageBox::Ok);
+        return;
+    }
+
+    QTextStream rOut(&rFile);
+
+    foreach (QString str, lines)
+        rOut << str << endl;
+
+    rFile.close();
+}
+
 
 Node* Map::getNodePtr(int index)
 {
@@ -194,4 +304,9 @@ void Map::movePathBehaviorDown(int index)
         return;
 
     pathBehaviors.move(index, index+1);
+}
+
+QString Map::hex(uint addr)
+{
+    return QString("%1").arg(addr, 8, 16, QChar('0')).toUpper();
 }

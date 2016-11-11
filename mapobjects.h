@@ -62,6 +62,10 @@ public:
     int getBowserJrPath();
     quint8 getUnk0() { return unk0; }
     quint8 getUnk1() { return unk1; }
+    quint8 getUnlock(int index) { return unlockedPaths[index]; }
+    quint8 getUnlockSecret(int index) { return unlockedPathsSecret[index]; }
+    quint8 getCameraScroll() { return cameraScroll; }
+    quint8 getCameraScrollSecret() { return cameraScrollSecret; }
 
     void setAreaId(quint8 areaId) { this->areaId = areaId; }
     void setIconId(quint8 iconId) { this->iconId = iconId; }
@@ -70,6 +74,10 @@ public:
     void setBowserJrPath(int index);
     void setUnk0(quint8 unk0) { this->unk0 = unk0; }
     void setUnk1(quint8 unk1) { this->unk1 = unk1; }
+    void setUnlock(int index, quint8 val) { this->unlockedPaths[index] = val; }
+    void setUnlockSecret(int index, quint8 val) { this->unlockedPathsSecret[index] = val; }
+    void setCameraScroll(quint8 cameraScroll) { this->cameraScroll = cameraScroll; }
+    void setCameraScrollSecret(quint8 cameraScrollSecret) { this->cameraScrollSecret = cameraScrollSecret; }
 
     QList<Path*> *pathList() { return &paths; }
 

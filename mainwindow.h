@@ -67,6 +67,8 @@ private slots:
 
     void on_actionMinimumZoom_triggered();
 
+    void on_actionExportC_triggered();
+
 private:
     Ui::MainWindow *ui;
     QSettings* settings;

@@ -55,6 +55,7 @@
     <addaction name="separator"/>
     <addaction name="actionSave"/>
     <addaction name="actionSaveAs"/>
+    <addaction name="actionExportC"/>
    </widget>
    <widget class="QMenu" name="menuView">
     <property name="title">
@@ -177,6 +178,14 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+G</string>
+   </property>
+  </action>
+  <action name="actionExportC">
+   <property name="text">
+    <string>Export to Code</string>
+   </property>
+   <property name="toolTip">
+    <string>Export to Code</string>
    </property>
   </action>
  </widget>

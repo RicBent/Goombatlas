@@ -18,13 +18,18 @@ SOURCES += main.cpp\
     map.cpp \
     mapobjects.cpp \
     nodeeditorwidget.cpp \
-    pathbehavioreditor.cpp
+    pathbehavioreditor.cpp \
+    cstreamwriter.cpp \
+    exportmapdialog.cpp
 
 HEADERS  += mainwindow.h \
     mapview.h \
     map.h \
     mapobjects.h \
     nodeeditorwidget.h \
-    pathbehavioreditor.h
+    pathbehavioreditor.h \
+    cstreamwriter.h \
+    exportmapdialog.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    exportmapdialog.ui

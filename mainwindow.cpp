@@ -1,6 +1,8 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include "exportmapdialog.h"
+
 #include <QDockWidget>
 #include <QFileDialog>
 #include <QMessageBox>
@@ -29,6 +31,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->actionMaximumZoom->setIcon(QIcon(iconsPath + "zoom_max.png"));
     ui->actionMinimumZoom->setIcon(QIcon(iconsPath + "zoom_min.png"));
     ui->actionGrid->setIcon(QIcon(iconsPath + "grid.png"));
+    ui->actionExportC->setIcon(QIcon(iconsPath + "export_c"));
 
 
     // Setup Map View
@@ -78,6 +81,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // Load Settings
     ui->actionGrid->setChecked(settings->value("GridEnabled", "1").toBool());
+    mapView->toggleGrid(settings->value("GridEnabled", "1").toBool());
 
     // We cannot scroll before the window is created
     QTimer::singleShot(0, this, SLOT(onLoad()));
@@ -157,7 +161,7 @@ void MainWindow::on_actionOpen_triggered()
     QFile file(openPath);
     if (!file.open(QFile::ReadOnly | QFile::Text))
     {
-        QMessageBox::information(this, "Goombatlas", "Could not open or create " + openPath + " for reading!", QMessageBox::Ok);
+        QMessageBox::information(this, "Goombatlas", "Could not open " + openPath + " for reading!", QMessageBox::Ok);
         return;
     }
 
@@ -179,6 +183,14 @@ void MainWindow::on_actionSaveAs_triggered()
     map->save(this, savePath);
     QFileInfo fileInfo(savePath);
     setMapName(fileInfo.fileName());
+}
+
+void MainWindow::on_actionExportC_triggered()
+{
+    ExportMapDialog emd(this);
+    emd.exec();
+
+    map->exportAsC(emd.getCPath(), emd.getReplacesPath(), emd.getPrefix(), emd.getWorldId());
 }
 
 void MainWindow::on_actionGrid_triggered(bool checked)
