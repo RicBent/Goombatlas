@@ -4,6 +4,7 @@
 #include "mapview.h"
 #include "nodeeditorwidget.h"
 #include "pathbehavioreditor.h"
+#include "mapobjecteditor.h"
 
 #include <QMainWindow>
 #include <QCoreApplication>
@@ -78,6 +79,7 @@ private:
     QScrollAreaRE* mapViewArea;
     NodeEditorWidget* nodeEditor;
     PathBehaviorEditor* pathBehaviorEditor;
+    MapObjectEditor* mapObjectEditor;
 
     void updateMap(QFile* file=NULL);
     void setMapName(QString mapName="Untitled Map");

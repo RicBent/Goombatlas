@@ -5,13 +5,15 @@ MovableObject::MovableObject()
     x = 0;
     y = 0;
     z = 0;
+    offsetx = 0;
+    offsetz = 0;
     width = 0;
     height = 0;
 }
 
 bool MovableObject::clickDetection(int x, int y)
 {
-    QRect rect(this->x-this->width/2, this->z-this->height/2, this->width, this->height);
+    QRect rect(this->x + this->offsetx, this->z + this->offsetz, this->width, this->height);
     return rect.contains(x, y);
 }
 
@@ -25,7 +27,7 @@ Node::Node(qint32 x, qint32 y, qint32 z)
     clearValues();
     this->x = x;
     this->y = y;
-    this->z = z;
+    this->z = z;    
 }
 
 Node::Node(QXmlStreamReader* xmlReader)
@@ -128,8 +130,10 @@ void Node::clearValues()
     this->x = 0;
     this->y = 0;
     this->z = 0;
-    this->width = 20;
-    this->height = 20;
+    this->offsetx = -12;
+    this->offsetz = -12;
+    this->width = 25;
+    this->height = 25;
     this->areaId = 0;
     this->iconId = 0;
     this->settings = 0;
@@ -204,6 +208,12 @@ void Node::setBowserJrPath(int index)
         settings |= 0x40;
 }
 
+bool Node::clickDetection(int x, int y)
+{
+    QRect rect(this->x-this->width/2, this->z-this->height/2, this->width, this->height);
+    return rect.contains(x, y);
+}
+
 
 PathBehavior::PathBehavior()
 {
@@ -247,5 +257,109 @@ void PathBehavior::writeXml(QXmlStreamWriter *xmlWriter)
     xmlWriter->writeTextElement("animationId", QString::number(animationId));
     xmlWriter->writeTextElement("starCoinCost", QString::number(starCoinCost));
     xmlWriter->writeTextElement("settings", QString::number(settings));
+    xmlWriter->writeEndElement();
+}
+
+
+MapObject::MapObject(quint8 type)
+{
+    this->type = type;
+    x = 0;
+    y = 0;
+    z = 0;
+    pathbehaviorId = 0;
+
+    if (type == 0)
+    {
+        offsetx = -16;
+        offsetz = -10;
+        width = 32;
+        height = 13;
+    }
+    if (type == 1)
+    {
+        offsetx = -28;
+        offsetz = -28;
+        width = 56;
+        height = 56;
+    }
+    else if (type == 2)
+    {
+        offsetx = -16;
+        offsetz = -16;
+        width = 32;
+        height = 32;
+    }
+}
+
+MapObject::MapObject(QXmlStreamReader* xmlReader, quint8 type)
+{
+    this->type = type;
+    x = 0;
+    y = 0;
+    z = 0;
+    offsetx = 0;
+    offsetz = 0;
+    pathbehaviorId = 0;
+
+    if (type == 0)
+    {
+        offsetx = -16;
+        offsetz = -10;
+        width = 32;
+        height = 13;
+    }
+    if (type == 1)
+    {
+        offsetx = -28;
+        offsetz = -28;
+        width = 56;
+        height = 56;
+    }
+    else if (type == 2)
+    {
+        offsetx = -16;
+        offsetz = -16;
+        width = 32;
+        height = 32;
+    }
+
+    while (!xmlReader->atEnd())
+    {
+        if(xmlReader->isEndElement())
+        {
+            xmlReader->readNext();
+            break;
+        }
+        else if(xmlReader->isStartElement())
+        {
+            if (xmlReader->name() == "pathBehaviorId")
+                pathbehaviorId = xmlReader->readElementText().toInt();
+            else if (xmlReader->name() == "x")
+                x = xmlReader->readElementText().toInt();
+            else if (xmlReader->name() == "y")
+                y = xmlReader->readElementText().toInt();
+            else if (xmlReader->name() == "z")
+                z = xmlReader->readElementText().toInt();
+        }
+        xmlReader->readNext();
+    }
+}
+
+void MapObject::writeXml(QXmlStreamWriter* xmlWriter)
+{
+    QString typeStr;
+    if (type == 0)
+        typeStr = "starCoinSign";
+    else if (type == 1)
+        typeStr = "towerCastle";
+    else
+        typeStr = "mushroomHouse";
+
+    xmlWriter->writeStartElement(typeStr);
+    xmlWriter->writeTextElement("pathBehaviorId", QString::number(pathbehaviorId));
+    xmlWriter->writeTextElement("x", QString::number(x));
+    xmlWriter->writeTextElement("y", QString::number(y));
+    xmlWriter->writeTextElement("z", QString::number(z));
     xmlWriter->writeEndElement();
 }

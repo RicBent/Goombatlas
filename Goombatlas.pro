@@ -20,7 +20,8 @@ SOURCES += main.cpp\
     nodeeditorwidget.cpp \
     pathbehavioreditor.cpp \
     cstreamwriter.cpp \
-    exportmapdialog.cpp
+    exportmapdialog.cpp \
+    mapobjecteditor.cpp
 
 HEADERS  += mainwindow.h \
     mapview.h \
@@ -29,7 +30,11 @@ HEADERS  += mainwindow.h \
     nodeeditorwidget.h \
     pathbehavioreditor.h \
     cstreamwriter.h \
-    exportmapdialog.h
+    exportmapdialog.h \
+    mapobjecteditor.h \
+    misc.h
 
 FORMS    += mainwindow.ui \
     exportmapdialog.ui
+
+CONFIG += c++11

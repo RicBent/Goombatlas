@@ -1,4 +1,5 @@
 #include "mapview.h"
+#include "misc.h"
 
 #include <QPaintEvent>
 #include <QPainter>
@@ -9,7 +10,7 @@ MapView::MapView(QWidget *parent, Map *map) : QWidget(parent)
     this->map = map;
     showGrid = true;
     gridSize = 64;
-    nodeSelected = false;
+    selected = false;
     drag = false;
 
     centerX = 1600;
@@ -161,8 +162,6 @@ void MapView::paintEvent(QPaintEvent* evt)
             end1.setY(end.y() - offset);
             end1 = rotateArroundPoint(end1, end, angle);
 
-            //qDebug() << start1 << end1 << qRadiansToDegrees(angle);
-
             if (p->settings & 0x40)
                 painter.setPen(pathPen);
             else
@@ -197,12 +196,51 @@ void MapView::paintEvent(QPaintEvent* evt)
         painter.drawPixmap(nodeRect, nodePixmap);
     }
 
-    if (nodeSelected)
+
+    // Draw Star Coin Signs
+
+    QString objectsPath(QCoreApplication::applicationDirPath() + "/goombatlas_data/objects/");
+
+    foreach (MapObject* o, map->starCoinSigns)
     {
-        QPen selPen(Qt::red);
-        selPen.setWidthF(2/zoom);
-        painter.setPen(selPen);
-        painter.drawEllipse(QRect(selectedNode->getx() - selectedNode->getwidth()/2, selectedNode->getz() - selectedNode->getheight()/2, selectedNode->getwidth(), selectedNode->getheight()));
+        QRect signRect(o->getx()+o->getoffsetx(), o->getz()+o->getoffsetz(), o->getwidth(), o->getheight());
+        QPixmap signPixmap(objectsPath + "star_coin_sign.png");
+        painter.drawPixmap(signRect, signPixmap);
+    }
+
+
+    // Draw Mushroom Houses
+
+    foreach (MapObject* o, map->mushroomHouses)
+    {
+        QRect mushroomRect(o->getx()+o->getoffsetx()-9, o->getz()+o->getoffsetz(), o->getwidth()+9, o->getheight());
+        QPixmap mushroomPixmap(objectsPath + "mushroom_house_red.png");
+        painter.drawPixmap(mushroomRect, mushroomPixmap);
+    }
+
+
+    // Draw Towers/Castles
+
+    foreach (MapObject* o, map->towersCastles)
+    {
+        QRect fortressRect(o->getx()+o->getoffsetx()+8, o->getz()+o->getoffsetz()+7, 55, 40);
+        QPixmap fortressPixmap(objectsPath + "tower.png");
+        painter.drawPixmap(fortressRect, fortressPixmap);
+    }
+
+
+    // Draw Selection
+
+    QPen selPen(Qt::red);
+    selPen.setWidthF(2/zoom);
+    painter.setPen(selPen);
+
+    if (selected)
+    {
+        if (is<Node*>(selectedObj))
+            painter.drawEllipse(QRect(selectedObj->getx() - selectedObj->getwidth()/2, selectedObj->getz() - selectedObj->getheight()/2, selectedObj->getwidth(), selectedObj->getheight()));
+        else
+            painter.drawRect(QRect(selectedObj->getx() + selectedObj->getoffsetx(), selectedObj->getz() + selectedObj->getoffsetz(), selectedObj->getwidth(), selectedObj->getheight()));
     }
 }
 
@@ -211,25 +249,21 @@ int MapView::roundDown(int num, int factor)
     return num - (num % factor) - factor;
 }
 
-void MapView::setNodeWidth(int width)
+void MapView::select(MovableObject* obj)
 {
-    foreach (Node* n, map->nodes)
-    {
-        n->setwidth(width);
-        n->setheight(width);
-    }
-}
+    if (is<Node*>(obj))
+        emit changeDeselectedMapObj();
+    if (is<MapObject*>(obj))
+        emit changeDeselectedNode();
 
-void MapView::selectNode(Node* node)
-{
-    nodeSelected = true;
-    selectedNode = node;
+    selected = true;
+    selectedObj = obj;
     repaint();
 }
 
-void MapView::deselectNode()
+void MapView::deselect()
 {
-    nodeSelected = false;
+    selected = false;
     repaint();
 }
 
@@ -243,48 +277,98 @@ void MapView::mousePressEvent(QMouseEvent* evt)
 
     if (evt->button() == Qt::LeftButton)
     {
-        bool actualNodeClicked = false;
+        bool actualObjClicked = false;
 
-        if (nodeSelected && selectedNode->clickDetection(mouseX, mouseY))
+        if (selected && selectedObj->clickDetection(mouseX, mouseY))
         {
-            actualNodeClicked = true;
-            dragX = selectedNode->getx();
-            dragY = selectedNode->getz();
+            actualObjClicked = true;
+            dragX = selectedObj->getx();
+            dragY = selectedObj->getz();
             lastX = mouseX;
             lastY = mouseY;
             drag = true;
         }
 
-        if (!actualNodeClicked)
+        if (!actualObjClicked)
         {
-            nodeSelected = false;
-            for (int i = map->nodes.length()-1; i >= 0; i--)
+            selected = false;
+
+            for (int i = map->towersCastles.length()-1; i >= 0; i--)
+            {
+                MapObject* o = map->towersCastles.at(i);
+                if (o->clickDetection(mouseX, mouseY))
+                {
+                    selectedObj = o;
+                    selected = true;
+                    emit changeSelectedMapObj(o);
+                    break;
+                }
+            }
+
+            if (!selected) for (int i = map->mushroomHouses.length()-1; i >= 0; i--)
+            {
+                MapObject* o = map->mushroomHouses.at(i);
+                if (o->clickDetection(mouseX, mouseY))
+                {
+                    selectedObj = o;
+                    selected = true;
+                    emit changeSelectedMapObj(o);
+                    break;
+                }
+            }
+
+            if (!selected) for (int i = map->starCoinSigns.length()-1; i >= 0; i--)
+            {
+                MapObject* o = map->starCoinSigns.at(i);
+                if (o->clickDetection(mouseX, mouseY))
+                {
+                    selectedObj = o;
+                    selected = true;
+                    emit changeSelectedMapObj(o);
+                    break;
+                }
+            }
+
+            if (!selected) for (int i = map->nodes.length()-1; i >= 0; i--)
             {
                 Node* n = map->getNodePtr(i);
                 if (n->clickDetection(mouseX, mouseY))
                 {
-                    selectedNode = n;
-                    nodeSelected = true;
-                    emit changeSelectedNode(selectedNode);
+                    selectedObj = n;
+                    selected = true;
+                    emit changeSelectedNode(n);
                     break;
                 }
             }
-            if (!nodeSelected)
+
+            if (selected)
+            {
+                if (!is<Node*>(selectedObj))
+                    emit changeDeselectedNode();
+
+                if (!is<MapObject*>(selectedObj))
+                    emit changeDeselectedMapObj();
+            }
+            else
+            {
                 emit changeDeselectedNode();
+                emit changeDeselectedMapObj();
+            }
         }
         repaint();
     }
     else if (evt->button() == Qt::RightButton)
     {
         Node* newNode = new Node(mouseX, 0, mouseY);
-        selectedNode = newNode;
-        dragX = selectedNode->getx();
-        dragY = selectedNode->getz();
+        selectedObj = newNode;
+        dragX = newNode->getx();
+        dragY = newNode->getz();
         lastX = mouseX;
         lastY = mouseY;
         drag = true;
         map->addNode(newNode);
         emit changeSelectedNode(newNode);
+        emit changeDeselectedMapObj();
     }
 }
 
@@ -298,13 +382,16 @@ void MapView::mouseMoveEvent(QMouseEvent* evt)
         int deltaX = mouseX - lastX;
         int deltaY = mouseY - lastY;
 
-        selectedNode->setx(selectedNode->getx() + deltaX);
-        selectedNode->setz(selectedNode->getz() + deltaY);
+        selectedObj->setx(selectedObj->getx() + deltaX);
+        selectedObj->setz(selectedObj->getz() + deltaY);
 
         lastX += deltaX;
         lastY += deltaY;
 
-        emit changeSelectedNode(selectedNode);
+        if (is<Node*>(selectedObj))
+            emit changeSelectedNode(dynamic_cast<Node*>(selectedObj));
+        else if (is<MapObject*>(selectedObj))
+            emit changeSelectedMapObj(dynamic_cast<MapObject*>(selectedObj));
 
         repaint();
     }

@@ -32,13 +32,17 @@ public:
 signals:
     void scrollTo(int x, int y);
     void scrollTo(QPoint p);
+
     void changeSelectedNode(Node* node);
     void changeDeselectedNode();
 
+    void changeSelectedMapObj(MapObject* mapObj);
+    void changeDeselectedMapObj();
+
 public slots:
     void viewAreaResized(QResizeEvent* evt);
-    void selectNode(Node* node);
-    void deselectNode();
+    void select(MovableObject* obj);
+    void deselect();
 
 protected:
     void paintEvent(QPaintEvent *) Q_DECL_OVERRIDE;
@@ -49,8 +53,8 @@ protected:
 private:
     Map* map;
 
-    Node* selectedNode;
-    bool nodeSelected;
+    MovableObject* selectedObj;
+    bool selected;
 
     bool drag;
     int dragX, dragY;

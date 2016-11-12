@@ -317,7 +317,7 @@ void NodeEditorWidget::_select(Node* node)
     nodeList->setCurrentRow(map->nodes.indexOf(node));
     nodeList->blockSignals(false);
     updateInfo();
-    emit nodeSelected(node);
+    emit nodeSelected(dynamic_cast<MovableObject*>(node));
 
     pUpdateList();
     pDeselect();
@@ -336,7 +336,11 @@ void NodeEditorWidget::deselect()
 
     pathList->clear();
     pDeselect();
+}
 
+void NodeEditorWidget::_deselect()
+{
+    deselect();
     emit nodeDeselected();
 }
 
@@ -650,7 +654,7 @@ void NodeEditorWidget::removeNodeClicked()
 
     map->removeNode(nodeList->currentIndex().row());
     updateList();
-    deselect();
+    _deselect();
     emit redrawMap();
 }
 
@@ -815,6 +819,7 @@ void NodeEditorWidget::reversePathAnimToggled(bool toggle)
 {
     editPath->settings &= 0xBF;
     editPath->settings |= (toggle << 6);
+    emit redrawMap();
 }
 
 void NodeEditorWidget::addPathClicked()

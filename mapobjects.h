@@ -15,12 +15,16 @@ public:
     qint32 getx() { return x; }
     qint32 gety() { return y; }
     qint32 getz() { return z; }
+    qint32 getoffsetx() { return offsetx; }
+    qint32 getoffsetz() { return offsetz; }
     qint32 getwidth() { return width; }
     qint32 getheight() { return height; }
 
     void setx(quint32 x) { this->x = x; }
     void sety(quint32 y) { this->y = y; }
     void setz(quint32 z) { this->z = z; }
+    void setoffsetx(quint32 offsetx) { this->offsetx = offsetx; }
+    void setoffsetz(quint32 offsetz) { this->offsetz = offsetz; }
     void setwidth(quint32 width) { this->width = width; }
     void setheight(quint32 height) { this->height = height; }
 
@@ -28,6 +32,7 @@ public:
 
 protected:
     qint32 x, y, z;
+    qint32 offsetx, offsetz;
     qint32 width, height;   // For click detection and rendering
 };
 
@@ -81,6 +86,8 @@ public:
 
     QList<Path*> *pathList() { return &paths; }
 
+    bool clickDetection(int x, int y);
+
 private:
     // Data Node
     QList<Path*> paths;
@@ -124,6 +131,27 @@ private:
     quint8 settings;
 
     void clearValues();
+};
+
+
+// Map Object
+
+class MapObject: public MovableObject
+{
+public:
+    MapObject(quint8 type);
+    MapObject(QXmlStreamReader* xmlReader, quint8 type);
+
+    void writeXml(QXmlStreamWriter* xmlWriter);
+
+    quint8 getPathBehaviorId() { return pathbehaviorId; }
+    void setPathBehaviorId(quint8 pathbehaviorId) { this->pathbehaviorId = pathbehaviorId; }
+
+    quint8 getType() { return type; }
+
+private:
+    quint8 type;
+    quint8 pathbehaviorId;
 };
 
 #endif // MAPOBJECTS_H

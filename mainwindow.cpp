@@ -51,16 +51,16 @@ MainWindow::MainWindow(QWidget *parent) :
     // Setup Node Editor
 
     nodeEditor = new NodeEditorWidget(map, mapView, this);
-    connect(nodeEditor, SIGNAL(redrawMap()), mapView, SLOT(update()));
+    connect(nodeEditor, SIGNAL(redrawMap()), mapView, SLOT(repaint()));
     connect(mapView, SIGNAL(changeSelectedNode(Node*)), nodeEditor, SLOT(select(Node*)));
     connect(mapView, SIGNAL(changeDeselectedNode()), nodeEditor, SLOT(deselect()));
-    connect(nodeEditor, SIGNAL(nodeSelected(Node*)), mapView, SLOT(selectNode(Node*)));
-    connect(nodeEditor, SIGNAL(nodeDeselected()), mapView, SLOT(deselectNode()));
+    connect(nodeEditor, SIGNAL(nodeSelected(MovableObject*)), mapView, SLOT(select(MovableObject*)));
+    connect(nodeEditor, SIGNAL(nodeDeselected()), mapView, SLOT(deselect()));
 
     QDockWidget* nodeEditorDock = new QDockWidget("Node Editor", this);
     nodeEditorDock->setWidget(nodeEditor);
 
-    addDockWidget(Qt::RightDockWidgetArea, nodeEditorDock);
+    addDockWidget(Qt::LeftDockWidgetArea, nodeEditorDock);
     nodeEditorDock->toggleViewAction()->setShortcut(QKeySequence("Ctrl+1"));
     nodeEditorDock->toggleViewAction()->setIcon(QIcon(iconsPath + "node.png"));
     ui->menuWindow->addAction(nodeEditorDock->toggleViewAction());
@@ -77,6 +77,24 @@ MainWindow::MainWindow(QWidget *parent) :
     pathBehaviorEditorDock->toggleViewAction()->setShortcut(QKeySequence("Ctrl+2"));
     pathBehaviorEditorDock->toggleViewAction()->setIcon(QIcon(iconsPath + "path_setting.png"));
     ui->menuWindow->addAction(pathBehaviorEditorDock->toggleViewAction());
+
+
+    // Setup Map Objects Editor
+
+    mapObjectEditor = new MapObjectEditor(map, mapView, this);
+    connect(mapObjectEditor, SIGNAL(redrawMap()), mapView, SLOT(repaint()));
+    connect(mapView, SIGNAL(changeSelectedMapObj(MapObject*)), mapObjectEditor, SLOT(select(MapObject*)));
+    connect(mapView, SIGNAL(changeDeselectedMapObj()), mapObjectEditor, SLOT(deselect()));
+    connect(mapObjectEditor, SIGNAL(objectSelected(MovableObject*)), mapView, SLOT(select(MovableObject*)));
+    connect(mapObjectEditor, SIGNAL(objectDeselected()), mapView, SLOT(deselect()));
+
+    QDockWidget* mapObjectEditorDock = new QDockWidget("Map Objects Editor", this);
+    mapObjectEditorDock->setWidget(mapObjectEditor);
+
+    addDockWidget(Qt::RightDockWidgetArea, mapObjectEditorDock);
+    mapObjectEditorDock->toggleViewAction()->setShortcut(QKeySequence("Ctrl+3"));
+    mapObjectEditorDock->toggleViewAction()->setIcon(QIcon(iconsPath + "object.png"));
+    ui->menuWindow->addAction(mapObjectEditorDock->toggleViewAction());
 
 
     // Load Settings
@@ -114,6 +132,7 @@ void MainWindow::updateMap(QFile* file)
     mapView->setMap(map);
     nodeEditor->setMap(map);
     pathBehaviorEditor->setMap(map);
+    mapObjectEditor->setMap(map);
 }
 
 

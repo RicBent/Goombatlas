@@ -118,3 +118,31 @@ void CStreamWriter::writePathBehaviors(QList<PathBehavior*>* paths, QString pref
 
     *stream << "};" << endl;
 }
+
+
+void CStreamWriter::writeMapObject(MapObject* mapObject)
+{
+     *stream << "\t{ " << mapObject->getPathBehaviorId() << ", {0, 0, 0}, " << mapObject->getx()*16 << ", " << mapObject->gety()*16 << ", " << mapObject->getz()*16 << " }," << endl;
+}
+
+void CStreamWriter::writeMapObjects(QList<MapObject*>* mapObjects, quint8 type, QString prefix)
+{
+    QString typeName;
+    if (type == 1)
+        typeName = "towersCastles";
+    else if (type == 2)
+        typeName = "mushroomHouses";
+    else
+        typeName = "starCoinSigns";
+
+    *stream << "pathBehavior " << prefix << "_" << typeName << "[] =" << endl << "{" << endl;
+
+    for (int i = 0; i < mapObjects->length(); i++)
+    {
+        MapObject* o = mapObjects->at(i);
+        writeMapObject(o);
+    }
+
+    *stream << "\t{ 0xFF, {0xFF, 0xFF, 0xFF}, 0, 0, 0 }" << endl;
+    *stream << "};" << endl;
+}

@@ -17,6 +17,9 @@ public:
 
     QList<Node*> nodes;
     QList<PathBehavior*> pathBehaviors;
+    QList<MapObject*> starCoinSigns;
+    QList<MapObject*> towersCastles;
+    QList<MapObject*> mushroomHouses;
 
     Node* getNodePtr(int index);
     void addNode(Node* node, int index = -1);
@@ -34,6 +37,7 @@ public:
 
     void readNodes(QXmlStreamReader* xmlReader);
     void readPathSettings(QXmlStreamReader* xmlReader);
+    void readMapObjects(QXmlStreamReader* xmlReader, quint8 type);
 
 private:
     QString path;

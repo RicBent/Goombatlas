@@ -25,6 +25,9 @@ public:
     void writePathBehavior(PathBehavior* p, bool comma=false);
     void writePathBehaviors(QList<PathBehavior*>* paths, QString prefix);
 
+    void writeMapObject(MapObject* mapObject);
+    void writeMapObjects(QList<MapObject*>* mapObjects, quint8 type, QString prefix);
+
 private:
     QFile* file;
     QTextStream* stream;

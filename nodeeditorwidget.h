@@ -27,7 +27,7 @@ public slots:
 
 signals:
     void redrawMap();
-    void nodeSelected(Node* n);
+    void nodeSelected(MovableObject* n);
     void nodeDeselected();
 
 private slots:
@@ -113,6 +113,7 @@ private:
     Path* editPath;
 
     void _select(Node* node);
+    void _deselect();
     void updateList(bool keepIndex=true);
     void setEditsEnabled(bool enabled);
     void updateInfo();

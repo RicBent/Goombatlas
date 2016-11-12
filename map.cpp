@@ -24,6 +24,12 @@ Map::Map(QFile* file)
                 readNodes(&xmlReader);
             else if (xmlReader.name() == "pathSettings")
                 readPathSettings(&xmlReader);
+            else if (xmlReader.name() == "starCoinSigns")
+                readMapObjects(&xmlReader, 0);
+            else if (xmlReader.name() == "towersCastles")
+                readMapObjects(&xmlReader, 1);
+            else if (xmlReader.name() == "mushroomHouses")
+                readMapObjects(&xmlReader, 2);
             else
                 xmlReader.readNext();
         }
@@ -79,6 +85,37 @@ void Map::readPathSettings(QXmlStreamReader* xmlReader)
     }
 }
 
+void Map::readMapObjects(QXmlStreamReader* xmlReader, quint8 type)
+{
+    while (!xmlReader->atEnd())
+    {
+        if(xmlReader->isEndElement())
+        {
+            xmlReader->readNext();
+            break;
+        }
+        else if(xmlReader->isStartElement())
+        {
+            if (type == 0)
+            {
+                if (xmlReader->name() == "starCoinSign")
+                    starCoinSigns.append(new MapObject(xmlReader, 0));
+            }
+            else if (type == 1)
+            {
+                if (xmlReader->name() == "towerCastle")
+                    towersCastles.append(new MapObject(xmlReader, 1));
+            }
+            else if (type == 2)
+            {
+                if (xmlReader->name() == "mushroomHouse")
+                    mushroomHouses.append(new MapObject(xmlReader, 2));
+            }
+        }
+        xmlReader->readNext();
+    }
+}
+
 bool Map::save(QWidget* parent, QString path)
 {
     if (path.isEmpty() || path.isEmpty())
@@ -107,6 +144,21 @@ bool Map::save(QWidget* parent, QString path)
         xmlWriter.writeStartElement("pathSettings");
         foreach (PathBehavior* p, pathBehaviors)
             p->writeXml(&xmlWriter);
+        xmlWriter.writeEndElement();
+
+        xmlWriter.writeStartElement("starCoinSigns");
+        foreach (MapObject* o, starCoinSigns)
+            o->writeXml(&xmlWriter);
+        xmlWriter.writeEndElement();
+
+        xmlWriter.writeStartElement("towersCastles");
+        foreach (MapObject* o, towersCastles)
+            o->writeXml(&xmlWriter);
+        xmlWriter.writeEndElement();
+
+        xmlWriter.writeStartElement("mushroomHouses");
+        foreach (MapObject* o, mushroomHouses)
+            o->writeXml(&xmlWriter);
         xmlWriter.writeEndElement();
 
     xmlWriter.writeEndElement();
@@ -145,6 +197,12 @@ void Map::exportAsC(QString cFilePath, QString rFilePath, QString prefix, int wo
     cWriter.writeVisibleNodes(&nodes, prefix);
     cWriter.writeEndl();
     cWriter.writePathBehaviors(&pathBehaviors, prefix);
+    cWriter.writeEndl();
+    cWriter.writeMapObjects(&starCoinSigns, 0, prefix);
+    cWriter.writeEndl();
+    cWriter.writeMapObjects(&towersCastles, 1, prefix);
+    cWriter.writeEndl();
+    cWriter.writeMapObjects(&mushroomHouses, 2, prefix);
 
     cFile.close();
 
@@ -201,9 +259,9 @@ void Map::exportAsC(QString cFilePath, QString rFilePath, QString prefix, int wo
     lines.append(hex(worldOffset+0x4) + "_ov_08: " + prefix + "_pathBehaviors");
     // Red Flying Block / Hammer Bros.
     lines.append(hex(worldOffset+0xC) + "_ov_08: " + prefix + "_visibleNodes");
-    // Star Coin Signs
-    // Towers/Castles
-    // Mushroom Houses
+    lines.append(hex(worldOffset+0x10) + "_ov_08: " + prefix + "_starCoinSigns");
+    lines.append(hex(worldOffset+0x14) + "_ov_08: " + prefix + "_towersCastles");
+    lines.append(hex(worldOffset+0x18) + "_ov_08: " + prefix + "_mushroomHouses");
     // Bowser Jr. Paths
     uint counts = nodes.count() & 0xFFFF;
     counts |= pathBehaviors.count() << 16;
