@@ -73,7 +73,7 @@ void MapView::zoomMin()
 void MapView::setMap(Map* map)
 {
     this->map = map;
-    update();
+    deselect();
 }
 
 QPoint MapView::getCurrentPos()
@@ -301,6 +301,14 @@ void MapView::deselect()
 
 void MapView::mousePressEvent(QMouseEvent* evt)
 {
+    if (evt->buttons() == Qt::MiddleButton)
+    {
+        sDragX = evt->x();
+        sDragY = evt->y();
+        drag = false;
+        return;
+    }
+
     int mouseX = evt->x()/zoom - centerX;
     int mouseY = evt->y()/zoom - centerY;
 
@@ -403,6 +411,16 @@ void MapView::mousePressEvent(QMouseEvent* evt)
 
 void MapView::mouseMoveEvent(QMouseEvent* evt)
 {
+    if (evt->buttons() & Qt::MiddleButton)
+    {
+        int x = evt->x();
+        int y = evt->y();
+
+        emit scrollTo_(visibleRegion().boundingRect().x() - x + sDragX, visibleRegion().boundingRect().y() - y + sDragY);
+        return;
+    }
+
+
     int mouseX = evt->x()/zoom - centerX;
     int mouseY = evt->y()/zoom - centerY;
 

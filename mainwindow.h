@@ -57,7 +57,10 @@ private slots:
 
 private slots:
     void mapScrollTo(int x, int y);
+
     void mapScrollTo(QPoint p);
+
+    void mapScrollTo_(int x, int y);
 
     void on_actionZoomIn_triggered();
 

@@ -44,6 +44,7 @@ MainWindow::MainWindow(QWidget *parent) :
     mapView = new MapView(this, map);
     connect(mapView, SIGNAL(scrollTo(int,int)), this, SLOT(mapScrollTo(int,int)));
     connect(mapView, SIGNAL(scrollTo(QPoint)), this, SLOT(mapScrollTo(QPoint)));
+    connect(mapView, SIGNAL(scrollTo_(int,int)), this, SLOT(mapScrollTo_(int,int)));
     mapViewArea->setWidget(mapView);
     connect(mapViewArea, SIGNAL(resized(QResizeEvent*)), mapView, SLOT(viewAreaResized(QResizeEvent*)));
 
@@ -171,6 +172,14 @@ void MainWindow::mapScrollTo(int x, int y)
 
     mapViewArea->horizontalScrollBar()->setValue(qMax((int)((x+mapView->getCenterX())*zoom)-wR/2, 0));
     mapViewArea->verticalScrollBar()->setValue(qMax((int)((y+mapView->getCenterY())*zoom)-hR/2, 0));
+}
+
+void MainWindow::mapScrollTo_(int x, int y)
+{
+    qMax(0, x);
+    qMax(0, y);
+    mapViewArea->horizontalScrollBar()->setValue(x);
+    mapViewArea->verticalScrollBar()->setValue(y);
 }
 
 void MainWindow::on_actionNew_triggered()

@@ -32,6 +32,7 @@ public:
 signals:
     void scrollTo(int x, int y);
     void scrollTo(QPoint p);
+    void scrollTo_(int x, int y);
 
     void changeSelectedNode(Node* node);
     void changeDeselectedNode();
@@ -59,6 +60,8 @@ private:
     bool drag;
     int dragX, dragY;
     int lastX, lastY;
+
+    int sDragX, sDragY;
 
     float zoom;
     bool showGrid;
