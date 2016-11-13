@@ -143,7 +143,10 @@ void CStreamWriter::writeMapObjects(QList<MapObject*>* mapObjects, quint8 type, 
         writeMapObject(o);
     }
 
-    *stream << "\t{ 0xFF, {0xFF, 0xFF, 0xFF}, 0, 0, 0 }" << endl;
+    if (type == 0)
+        *stream << "\t{ 0x00, {0x00, 0x00, 0x00}, 0, 0, 0 }" << endl;
+    else
+        *stream << "\t{ 0xFF, {0xFF, 0xFF, 0xFF}, 0, 0, 0 }" << endl;
     *stream << "};" << endl;
 }
 

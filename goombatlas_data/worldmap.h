@@ -53,7 +53,7 @@ typedef struct mapObject
 	s32 x;
 	s32 y;
 	s32 z;
-} worldmapObject;
+} mapObject;
 
 typedef struct bowserJrNode
 {
@@ -67,9 +67,9 @@ typedef struct world
 	pathBehavior *pathBehaviors;
 	sprites *mapObjs;
 	visibleNode *visibleNode;
-	worldmapObject *starcoinSigns;		// As many as you want. Last one should be zeroed
-	worldmapObject *strongholds;		// ^
-	worldmapObject *mushroomHouses;		// ^
+	mapObject *starcoinSigns;		// As many as you want. Last one should be zeroed
+	mapObject *strongholds;		// ^
+	mapObject *mushroomHouses;		// ^
 	bowserJrNode **bowserJrPaths;
 	u16 nodeCount;
 	u16 pathCount;
