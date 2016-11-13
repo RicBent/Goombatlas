@@ -6,11 +6,19 @@
 Map::Map()
 {
     path = "";
+    sprite1StartNode = 0;
+    sprite1Type = 0;
+    sprite2StartNode = 0;
+    sprite2Type = 0;
 }
 
 Map::Map(QFile* file)
 {
     path = file->fileName();
+    sprite1StartNode = 0;
+    sprite1Type = 0;
+    sprite2StartNode = 0;
+    sprite2Type = 0;
 
     QXmlStreamReader xmlReader(file);
 
@@ -30,6 +38,8 @@ Map::Map(QFile* file)
                 readMapObjects(&xmlReader, 1);
             else if (xmlReader.name() == "mushroomHouses")
                 readMapObjects(&xmlReader, 2);
+            else if (xmlReader.name() == "sprites")
+                readSprites(&xmlReader);
             else
                 xmlReader.readNext();
         }
@@ -116,6 +126,30 @@ void Map::readMapObjects(QXmlStreamReader* xmlReader, quint8 type)
     }
 }
 
+void Map::readSprites(QXmlStreamReader* xmlReader)
+{
+    while (!xmlReader->atEnd())
+    {
+        if(xmlReader->isEndElement())
+        {
+            xmlReader->readNext();
+            break;
+        }
+        else if(xmlReader->isStartElement())
+        {
+            if (xmlReader->name() == "sprite1Type")
+                sprite1Type = xmlReader->readElementText().toUInt();
+            else if (xmlReader->name() == "sprite2Type")
+                sprite2Type = xmlReader->readElementText().toUInt();
+            else if (xmlReader->name() == "sprite1StartNode")
+                sprite1StartNode = xmlReader->readElementText().toUInt();
+            else if (xmlReader->name() == "sprite2StartNode")
+                sprite2StartNode = xmlReader->readElementText().toUInt();
+        }
+        xmlReader->readNext();
+    }
+}
+
 bool Map::save(QWidget* parent, QString path)
 {
     if (path.isEmpty() || path.isEmpty())
@@ -161,6 +195,14 @@ bool Map::save(QWidget* parent, QString path)
             o->writeXml(&xmlWriter);
         xmlWriter.writeEndElement();
 
+        xmlWriter.writeStartElement("sprites");
+            xmlWriter.writeTextElement("sprite1Type", QString::number(sprite1Type));
+            xmlWriter.writeTextElement("sprite1StartNode", QString::number(sprite1StartNode));
+            xmlWriter.writeTextElement("sprite2Type", QString::number(sprite2Type));
+            xmlWriter.writeTextElement("sprite2StartNode", QString::number(sprite2StartNode));
+        xmlWriter.writeEndElement();
+
+
     xmlWriter.writeEndElement();
 
     xmlWriter.writeEndElement();
@@ -203,6 +245,8 @@ void Map::exportAsC(QString cFilePath, QString rFilePath, QString prefix, int wo
     cWriter.writeMapObjects(&towersCastles, 1, prefix);
     cWriter.writeEndl();
     cWriter.writeMapObjects(&mushroomHouses, 2, prefix);
+    cWriter.writeEndl();
+    cWriter.writeSprites(this, prefix);
 
     cFile.close();
 
@@ -257,7 +301,7 @@ void Map::exportAsC(QString cFilePath, QString rFilePath, QString prefix, int wo
     uint worldOffset = 0x20E79C4 + (worldId-1)*0x28;
     lines.append(hex(worldOffset) + "_ov_08: " + prefix + "_nodes");
     lines.append(hex(worldOffset+0x4) + "_ov_08: " + prefix + "_pathBehaviors");
-    // Red Flying Block / Hammer Bros.
+    lines.append(hex(worldOffset+0x8) + "_ov_08: " + prefix + "_sprites");
     lines.append(hex(worldOffset+0xC) + "_ov_08: " + prefix + "_visibleNodes");
     lines.append(hex(worldOffset+0x10) + "_ov_08: " + prefix + "_starCoinSigns");
     lines.append(hex(worldOffset+0x14) + "_ov_08: " + prefix + "_towersCastles");

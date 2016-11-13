@@ -21,7 +21,8 @@ SOURCES += main.cpp\
     pathbehavioreditor.cpp \
     cstreamwriter.cpp \
     exportmapdialog.cpp \
-    mapobjecteditor.cpp
+    mapobjecteditor.cpp \
+    spriteseditor.cpp
 
 HEADERS  += mainwindow.h \
     mapview.h \
@@ -32,7 +33,8 @@ HEADERS  += mainwindow.h \
     cstreamwriter.h \
     exportmapdialog.h \
     mapobjecteditor.h \
-    misc.h
+    misc.h \
+    spriteseditor.h
 
 FORMS    += mainwindow.ui \
     exportmapdialog.ui

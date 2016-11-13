@@ -1,7 +1,7 @@
 #ifndef CSTREAMWRITER_H
 #define CSTREAMWRITER_H
 
-#include <mapobjects.h>
+#include "map.h"
 
 #include <QFile>
 #include <QTextStream>
@@ -27,6 +27,8 @@ public:
 
     void writeMapObject(MapObject* mapObject);
     void writeMapObjects(QList<MapObject*>* mapObjects, quint8 type, QString prefix);
+
+    void writeSprites(Map* map, QString prefix);
 
 private:
     QFile* file;

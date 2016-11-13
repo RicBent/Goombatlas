@@ -122,7 +122,7 @@ void CStreamWriter::writePathBehaviors(QList<PathBehavior*>* paths, QString pref
 
 void CStreamWriter::writeMapObject(MapObject* mapObject)
 {
-     *stream << "\t{ " << mapObject->getPathBehaviorId() << ", {0, 0, 0}, " << mapObject->getx()*16 << ", " << mapObject->gety()*16 << ", " << mapObject->getz()*16 << " }," << endl;
+     *stream << "\t{ " << mapObject->getNodeId() << ", {0, 0, 0}, " << mapObject->getx()*0x1000 << ", " << mapObject->gety()*0x1000 << ", " << mapObject->getz()*0x1000 << " }," << endl;
 }
 
 void CStreamWriter::writeMapObjects(QList<MapObject*>* mapObjects, quint8 type, QString prefix)
@@ -144,5 +144,12 @@ void CStreamWriter::writeMapObjects(QList<MapObject*>* mapObjects, quint8 type, 
     }
 
     *stream << "\t{ 0xFF, {0xFF, 0xFF, 0xFF}, 0, 0, 0 }" << endl;
+    *stream << "};" << endl;
+}
+
+void CStreamWriter::writeSprites(Map* map, QString prefix)
+{
+    *stream << "pathBehavior " << prefix << "_sprites =" << endl << "{" << endl;
+    *stream << "\t" << map->sprite1StartNode << ", " << map->sprite1Type << ", " << map->sprite2StartNode << ", " << map->sprite2Type << endl;
     *stream << "};" << endl;
 }

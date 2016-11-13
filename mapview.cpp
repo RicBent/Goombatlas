@@ -214,7 +214,23 @@ void MapView::paintEvent(QPaintEvent* evt)
     foreach (MapObject* o, map->mushroomHouses)
     {
         QRect mushroomRect(o->getx()+o->getoffsetx()-9, o->getz()+o->getoffsetz(), o->getwidth()+9, o->getheight());
+
         QPixmap mushroomPixmap(objectsPath + "mushroom_house_red.png");
+
+        if (o->getNodeId() < map->nodes.length())
+        {
+            Node* parentNode = map->nodes.at(o->getNodeId());
+            if (parentNode->getIconId() == 18)
+                mushroomPixmap = QPixmap(objectsPath + "mushroom_house_green.png");
+            else if (parentNode->getIconId() == 19)
+            {
+                mushroomPixmap = QPixmap(objectsPath + "mushroom_house_orange.png");
+                mushroomRect.adjust(0, -6, 6, 0);
+            }
+            if (parentNode->getIconId() == 23)
+                mushroomPixmap = QPixmap(objectsPath + "mushroom_house_blue.png");
+        }
+
         painter.drawPixmap(mushroomRect, mushroomPixmap);
     }
 
@@ -223,9 +239,22 @@ void MapView::paintEvent(QPaintEvent* evt)
 
     foreach (MapObject* o, map->towersCastles)
     {
-        QRect fortressRect(o->getx()+o->getoffsetx()+8, o->getz()+o->getoffsetz()+7, 55, 40);
-        QPixmap fortressPixmap(objectsPath + "tower.png");
-        painter.drawPixmap(fortressRect, fortressPixmap);
+        if (o->getNodeId() < map->nodes.length())
+        {
+            Node* parentNode = map->nodes.at(o->getNodeId());
+
+            if (parentNode->getIconId() == 14)
+            {
+                QRect castleRect(o->getx()+o->getoffsetx()-7, o->getz()+o->getoffsetz(), 73, o->getheight());
+                QPixmap castlePixmap(objectsPath + "castle.png");
+                painter.drawPixmap(castleRect, castlePixmap);
+                continue;
+            }
+        }
+
+        QRect towerRect(o->getx()+o->getoffsetx()+8, o->getz()+o->getoffsetz()+7, 55, 40);
+        QPixmap towerPixmap(objectsPath + "tower.png");
+        painter.drawPixmap(towerRect, towerPixmap);
     }
 
 

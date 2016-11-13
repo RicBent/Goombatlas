@@ -267,7 +267,7 @@ MapObject::MapObject(quint8 type)
     x = 0;
     y = 0;
     z = 0;
-    pathbehaviorId = 0;
+    nodeId = 0;
 
     if (type == 0)
     {
@@ -300,7 +300,7 @@ MapObject::MapObject(QXmlStreamReader* xmlReader, quint8 type)
     z = 0;
     offsetx = 0;
     offsetz = 0;
-    pathbehaviorId = 0;
+    nodeId = 0;
 
     if (type == 0)
     {
@@ -333,8 +333,8 @@ MapObject::MapObject(QXmlStreamReader* xmlReader, quint8 type)
         }
         else if(xmlReader->isStartElement())
         {
-            if (xmlReader->name() == "pathBehaviorId")
-                pathbehaviorId = xmlReader->readElementText().toInt();
+            if (xmlReader->name() == "nodeId")
+                nodeId = xmlReader->readElementText().toInt();
             else if (xmlReader->name() == "x")
                 x = xmlReader->readElementText().toInt();
             else if (xmlReader->name() == "y")
@@ -357,7 +357,7 @@ void MapObject::writeXml(QXmlStreamWriter* xmlWriter)
         typeStr = "mushroomHouse";
 
     xmlWriter->writeStartElement(typeStr);
-    xmlWriter->writeTextElement("pathBehaviorId", QString::number(pathbehaviorId));
+    xmlWriter->writeTextElement("nodeId", QString::number(nodeId));
     xmlWriter->writeTextElement("x", QString::number(x));
     xmlWriter->writeTextElement("y", QString::number(y));
     xmlWriter->writeTextElement("z", QString::number(z));

@@ -17,7 +17,7 @@ MapObjectEditor::MapObjectEditor(Map* map, MapView* mapView, QWidget* parent) : 
 
     type = new QComboBox(this);
     type->addItem("Star Coin Signs");
-    type->addItem("Castles/Towers");
+    type->addItem("Towers/Castles");
     type->addItem("Mushroom Houses");
     connect(type, SIGNAL(currentIndexChanged(int)), this, SLOT(typeChanged(int)));
     layout->addWidget(type);
@@ -54,28 +54,28 @@ MapObjectEditor::MapObjectEditor(Map* map, MapView* mapView, QWidget* parent) : 
 
     QGridLayout* editsLayout = new QGridLayout();
 
-    editsLayout->addWidget(new QLabel("Path Setting ID:"), 0, 0, 1, 1, Qt::AlignRight);
-    pathBehaviorId = new QSpinBox(this);
-    pathBehaviorId->setRange(0, 255);
-    pathBehaviorId->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-    connect(pathBehaviorId, SIGNAL(valueChanged(int)), this, SLOT(pathBehaviorChanged(int)));
-    editsLayout->addWidget(pathBehaviorId, 0, 1);
+    editsLayout->addWidget(new QLabel("Node ID:"), 0, 0, 1, 1, Qt::AlignRight);
+    nodeId = new QSpinBox(this);
+    nodeId->setRange(0, 255);
+    nodeId->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    connect(nodeId, SIGNAL(valueChanged(int)), this, SLOT(nodeIdChanged(int)));
+    editsLayout->addWidget(nodeId, 0, 1);
 
     editsLayout->addWidget(new QLabel("X:"), 1, 0, 1, 1, Qt::AlignRight);
     xPos = new QSpinBox(this);
-    xPos->setRange(-0x8000000, 0x7FFFFFF);
+    xPos->setRange(-0x80000, 0x7FFFF);
     connect(xPos, SIGNAL(valueChanged(int)), this, SLOT(xChanged(int)));
     editsLayout->addWidget(xPos, 1, 1);
 
     editsLayout->addWidget(new QLabel("Y:"), 2, 0, 1, 1, Qt::AlignRight);
     yPos = new QSpinBox(this);
-    yPos->setRange(-0x8000000, 0x7FFFFFF);
+    yPos->setRange(-0x80000, 0x7FFFF);
     connect(yPos, SIGNAL(valueChanged(int)), this, SLOT(yChanged(int)));
     editsLayout->addWidget(yPos, 2, 1);
 
     editsLayout->addWidget(new QLabel("Z:"), 3, 0, 1, 1, Qt::AlignRight);
     zPos = new QSpinBox(this);
-    zPos->setRange(-0x8000000, 0x7FFFFFF);
+    zPos->setRange(-0x80000, 0x7FFFF);
     connect(zPos, SIGNAL(valueChanged(int)), this, SLOT(zChanged(int)));
     editsLayout->addWidget(zPos, 3, 1);
 
@@ -178,7 +178,7 @@ void MapObjectEditor::updateList(bool keepIndex)
 
 void MapObjectEditor::setEditsEnabled(bool enabled)
 {
-    pathBehaviorId->setEnabled(enabled);
+    nodeId->setEnabled(enabled);
     xPos->setEnabled(enabled);
     yPos->setEnabled(enabled);
     zPos->setEnabled(enabled);
@@ -187,7 +187,7 @@ void MapObjectEditor::setEditsEnabled(bool enabled)
 void MapObjectEditor::updateInfo()
 {
     allowChanges(false);
-    pathBehaviorId->setValue(editObject->getPathBehaviorId());
+    nodeId->setValue(editObject->getNodeId());
     xPos->setValue(editObject->getx());
     yPos->setValue(editObject->gety());
     zPos->setValue(editObject->getz());
@@ -196,7 +196,7 @@ void MapObjectEditor::updateInfo()
 
 void MapObjectEditor::allowChanges(bool allow)
 {
-    pathBehaviorId->blockSignals(!allow);
+    nodeId->blockSignals(!allow);
     xPos->blockSignals(!allow);
     yPos->blockSignals(!allow);
     zPos->blockSignals(!allow);
@@ -205,7 +205,7 @@ void MapObjectEditor::allowChanges(bool allow)
 void MapObjectEditor::clearValues()
 {
     allowChanges(false);
-    pathBehaviorId->setValue(0);
+    nodeId->setValue(0);
     xPos->setValue(0);
     yPos->setValue(0);
     zPos->setValue(0);
@@ -282,9 +282,9 @@ void MapObjectEditor::moveDownClicked()
     _select(selMapObj);
 }
 
-void MapObjectEditor::pathBehaviorChanged(int pathBehavior)
+void MapObjectEditor::nodeIdChanged(int nodeId)
 {
-    editObject->setPathBehaviorId(pathBehavior);
+    editObject->setNodeId(nodeId);
 }
 
 void MapObjectEditor::xChanged(int x)

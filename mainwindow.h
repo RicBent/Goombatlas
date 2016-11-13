@@ -5,6 +5,7 @@
 #include "nodeeditorwidget.h"
 #include "pathbehavioreditor.h"
 #include "mapobjecteditor.h"
+#include "spriteseditor.h"
 
 #include <QMainWindow>
 #include <QCoreApplication>
@@ -80,6 +81,7 @@ private:
     NodeEditorWidget* nodeEditor;
     PathBehaviorEditor* pathBehaviorEditor;
     MapObjectEditor* mapObjectEditor;
+    SpritesEditor* spritesEditor;
 
     void updateMap(QFile* file=NULL);
     void setMapName(QString mapName="Untitled Map");

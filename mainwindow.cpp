@@ -97,6 +97,19 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->menuWindow->addAction(mapObjectEditorDock->toggleViewAction());
 
 
+    // Setup Sprites Editor
+
+    spritesEditor = new SpritesEditor(map, this);
+
+    QDockWidget* spritesEditorDock = new QDockWidget("Sprites Editor", this);
+    spritesEditorDock->setWidget(spritesEditor);
+
+    addDockWidget(Qt::RightDockWidgetArea, spritesEditorDock);
+    spritesEditorDock->toggleViewAction()->setShortcut(QKeySequence("Ctrl+4"));
+    spritesEditorDock->toggleViewAction()->setIcon(QIcon(iconsPath + "sprite.png"));
+    ui->menuWindow->addAction(spritesEditorDock->toggleViewAction());
+
+
     // Load Settings
     ui->actionGrid->setChecked(settings->value("GridEnabled", "1").toBool());
     mapView->toggleGrid(settings->value("GridEnabled", "1").toBool());
@@ -133,6 +146,7 @@ void MainWindow::updateMap(QFile* file)
     nodeEditor->setMap(map);
     pathBehaviorEditor->setMap(map);
     mapObjectEditor->setMap(map);
+    spritesEditor->setMap(map);
 }
 
 
@@ -199,6 +213,8 @@ void MainWindow::on_actionSave_triggered()
 void MainWindow::on_actionSaveAs_triggered()
 {
     QString savePath = QFileDialog::getSaveFileName(this, "Save Map", "", "Goombatlas Map (*.gbmap)");
+    if (savePath == "")
+        return;
     map->save(this, savePath);
     QFileInfo fileInfo(savePath);
     setMapName(fileInfo.fileName());

@@ -21,6 +21,11 @@ public:
     QList<MapObject*> towersCastles;
     QList<MapObject*> mushroomHouses;
 
+    quint8 sprite1Type;
+    quint8 sprite1StartNode;
+    quint8 sprite2Type;
+    quint8 sprite2StartNode;
+
     Node* getNodePtr(int index);
     void addNode(Node* node, int index = -1);
     void removeNode(int index);
@@ -35,12 +40,13 @@ public:
     void movePathBehaviorUp(int index);
     void movePathBehaviorDown(int index);
 
+private:
+    QString path;
+
     void readNodes(QXmlStreamReader* xmlReader);
     void readPathSettings(QXmlStreamReader* xmlReader);
     void readMapObjects(QXmlStreamReader* xmlReader, quint8 type);
-
-private:
-    QString path;
+    void readSprites(QXmlStreamReader* xmlReader);
 
     QString hex(uint addr);
 };

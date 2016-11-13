@@ -34,7 +34,7 @@ private slots:
     void removeObjectClicked();
     void moveUpClicked();
     void moveDownClicked();
-    void pathBehaviorChanged(int pathBehavior);
+    void nodeIdChanged(int nodeId);
     void xChanged(int x);
     void yChanged(int y);
     void zChanged(int z);
@@ -50,7 +50,7 @@ private:
     QComboBox* type;
     QListWidget* objectList;
     QToolBar* toolbar;
-    QSpinBox* pathBehaviorId;
+    QSpinBox* nodeId;
     QSpinBox* xPos;
     QSpinBox* yPos;
     QSpinBox* zPos;

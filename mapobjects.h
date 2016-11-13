@@ -144,14 +144,14 @@ public:
 
     void writeXml(QXmlStreamWriter* xmlWriter);
 
-    quint8 getPathBehaviorId() { return pathbehaviorId; }
-    void setPathBehaviorId(quint8 pathbehaviorId) { this->pathbehaviorId = pathbehaviorId; }
+    quint8 getNodeId() { return nodeId; }
+    void setNodeId(quint8 nodeId) { this->nodeId = nodeId; }
 
     quint8 getType() { return type; }
 
 private:
     quint8 type;
-    quint8 pathbehaviorId;
+    quint8 nodeId;
 };
 
 #endif // MAPOBJECTS_H
