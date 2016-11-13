@@ -21,7 +21,7 @@ void CStreamWriter::writeInclude(QString file)
 
 void CStreamWriter::writeNode(Node* n, QString prefix, int index, bool comma)
 {
-    *stream << "\t{ &" << prefix << "_path_" << index << ", " << n->getAreaId() << ", " << n->getUnk0()
+    *stream << "\t{ " << prefix << "_path_" << index << ", " << n->getAreaId() << ", " << n->getUnk0()
             << ", " << n->getUnk1() << ", " << n->getIconId() << ", " << n->getSettings() << ", {0, 0, 0} }";
 
     if (comma)
@@ -52,7 +52,7 @@ void CStreamWriter::writePaths(QList<Node *> *nodes, QString prefix)
     {
         Node* n = nodes->at(i);
 
-        *stream << "path " << prefix << "_path_" << i << " =" << endl << "{" << endl;
+        *stream << "path " << prefix << "_path_" << i << "[] =" << endl << "{" << endl;
 
         for (int j = 0; j < n->pathList()->count(); j++)
         {
@@ -135,7 +135,7 @@ void CStreamWriter::writeMapObjects(QList<MapObject*>* mapObjects, quint8 type, 
     else
         typeName = "starCoinSigns";
 
-    *stream << "pathBehavior " << prefix << "_" << typeName << "[] =" << endl << "{" << endl;
+    *stream << "mapObject " << prefix << "_" << typeName << "[] =" << endl << "{" << endl;
 
     for (int i = 0; i < mapObjects->length(); i++)
     {
@@ -149,7 +149,7 @@ void CStreamWriter::writeMapObjects(QList<MapObject*>* mapObjects, quint8 type, 
 
 void CStreamWriter::writeSprites(Map* map, QString prefix)
 {
-    *stream << "pathBehavior " << prefix << "_sprites =" << endl << "{" << endl;
+    *stream << "sprites " << prefix << "_sprites =" << endl << "{" << endl;
     *stream << "\t" << map->sprite1StartNode << ", " << map->sprite1Type << ", " << map->sprite2StartNode << ", " << map->sprite2Type << endl;
     *stream << "};" << endl;
 }

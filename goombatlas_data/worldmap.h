@@ -46,7 +46,7 @@ typedef struct visibleNode
 	s32 z;
 } visibleNode;
 
-typedef struct worldmapObject
+typedef struct mapObject
 {
 	u8 animationId;
 	u8 pad[3];
@@ -65,7 +65,7 @@ typedef struct world
 {
 	node *nodes;
 	pathBehavior *pathBehaviors;
-	mapObjects *mapObjs;
+	sprites *mapObjs;
 	visibleNode *visibleNode;
 	worldmapObject *starcoinSigns;		// As many as you want. Last one should be zeroed
 	worldmapObject *strongholds;		// ^
