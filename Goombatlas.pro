@@ -22,7 +22,8 @@ SOURCES += main.cpp\
     cstreamwriter.cpp \
     exportmapdialog.cpp \
     mapobjecteditor.cpp \
-    spriteseditor.cpp
+    spriteseditor.cpp \
+    mode.cpp
 
 HEADERS  += mainwindow.h \
     mapview.h \
@@ -34,7 +35,8 @@ HEADERS  += mainwindow.h \
     exportmapdialog.h \
     mapobjecteditor.h \
     misc.h \
-    spriteseditor.h
+    spriteseditor.h \
+    mode.h
 
 FORMS    += mainwindow.ui \
     exportmapdialog.ui

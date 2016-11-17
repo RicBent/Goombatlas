@@ -3,7 +3,6 @@
 
 #include "exportmapdialog.h"
 
-#include <QDockWidget>
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QScrollBar>
@@ -18,6 +17,18 @@ MainWindow::MainWindow(QWidget *parent) :
     setMapName();
 
     QString iconsPath(QCoreApplication::applicationDirPath() + "/goombatlas_data/icons/");
+
+
+    // Setup Mode Selection Box
+
+    modeBox = new QComboBox(this);
+    ui->toolBar->insertWidget(ui->actionModePlaceholder, modeBox);
+    ui->toolBar->removeAction(ui->actionModePlaceholder);
+    connect(modeBox, SIGNAL(currentIndexChanged(int)), this, SLOT(modeChanged(int)));
+
+    modes.append(Mode("Edition"));
+    modes.append(Mode("Animation"));
+
 
     // Load icons
 
@@ -65,9 +76,10 @@ MainWindow::MainWindow(QWidget *parent) :
     nodeEditorDock->toggleViewAction()->setShortcut(QKeySequence("Ctrl+1"));
     nodeEditorDock->toggleViewAction()->setIcon(QIcon(iconsPath + "node.png"));
     ui->menuWindow->addAction(nodeEditorDock->toggleViewAction());
+    modes[0].addDock(nodeEditorDock);
 
 
-    // Setup Node Editor
+    // Setup Path Behavior Editor
 
     pathBehaviorEditor = new PathBehaviorEditor(map, this);
 
@@ -78,6 +90,7 @@ MainWindow::MainWindow(QWidget *parent) :
     pathBehaviorEditorDock->toggleViewAction()->setShortcut(QKeySequence("Ctrl+2"));
     pathBehaviorEditorDock->toggleViewAction()->setIcon(QIcon(iconsPath + "path_setting.png"));
     ui->menuWindow->addAction(pathBehaviorEditorDock->toggleViewAction());
+    modes[0].addDock(pathBehaviorEditorDock);
 
 
     // Setup Map Objects Editor
@@ -96,6 +109,7 @@ MainWindow::MainWindow(QWidget *parent) :
     mapObjectEditorDock->toggleViewAction()->setShortcut(QKeySequence("Ctrl+3"));
     mapObjectEditorDock->toggleViewAction()->setIcon(QIcon(iconsPath + "object.png"));
     ui->menuWindow->addAction(mapObjectEditorDock->toggleViewAction());
+    modes[0].addDock(mapObjectEditorDock);
 
 
     // Setup Sprites Editor
@@ -109,7 +123,16 @@ MainWindow::MainWindow(QWidget *parent) :
     spritesEditorDock->toggleViewAction()->setShortcut(QKeySequence("Ctrl+4"));
     spritesEditorDock->toggleViewAction()->setIcon(QIcon(iconsPath + "sprite.png"));
     ui->menuWindow->addAction(spritesEditorDock->toggleViewAction());
+    modes[0].addDock(spritesEditorDock);
 
+
+    // Update Mode Selector
+    for (int i = 0; i < modes.length(); i++)
+    {
+        modes[i].deactivate();
+        modeBox->addItem(modes[i].getName());
+    }
+    modes[0].activate();
 
     // Load Settings
     ui->actionGrid->setChecked(settings->value("GridEnabled", "1").toBool());
@@ -132,6 +155,15 @@ MainWindow::~MainWindow()
 void MainWindow::onLoad()
 {
     mapScrollTo(0, 0);
+}
+
+void MainWindow::modeChanged(int modeIndex)
+{
+    for (int i = 0; i < modes.length(); i++)
+        modes[i].deactivate();
+    modes[modeIndex].activate();
+
+    mapView->setMode(modeIndex);
 }
 
 void MainWindow::updateMap(QFile* file)

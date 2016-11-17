@@ -1,6 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include "mode.h"
 #include "mapview.h"
 #include "nodeeditorwidget.h"
 #include "pathbehavioreditor.h"
@@ -12,6 +13,8 @@
 #include <QSettings>
 #include <QScrollArea>
 #include <QResizeEvent>
+#include <QDockWidget>
+#include <QComboBox>
 
 namespace Ui {
 class MainWindow;
@@ -56,6 +59,8 @@ private slots:
     void on_actionGrid_triggered(bool checked);
 
 private slots:
+    void modeChanged(int modeIndex);
+
     void mapScrollTo(int x, int y);
 
     void mapScrollTo(QPoint p);
@@ -77,6 +82,9 @@ private slots:
 private:
     Ui::MainWindow *ui;
     QSettings* settings;
+    QComboBox* modeBox;
+
+    QList<Mode> modes;
 
     Map* map;
     MapView* mapView;

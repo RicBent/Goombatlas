@@ -1,4 +1,4 @@
-#include "nsmb.h"
+#include <nds.h>
 
 typedef struct path
 {

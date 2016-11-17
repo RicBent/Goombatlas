@@ -8,6 +8,7 @@
 MapView::MapView(QWidget *parent, Map *map) : QWidget(parent)
 {
     this->map = map;
+    mode = 0;
     showGrid = true;
     gridSize = 64;
     selected = false;
@@ -22,6 +23,13 @@ MapView::MapView(QWidget *parent, Map *map) : QWidget(parent)
 MapView::~MapView()
 {
 
+}
+
+void MapView::setMode(int mode)
+{
+    this->mode = mode;
+    selected = false;
+    repaint();
 }
 
 void MapView::viewAreaResized(QResizeEvent* evt)
@@ -266,10 +274,13 @@ void MapView::paintEvent(QPaintEvent* evt)
 
     if (selected)
     {
-        if (is<Node*>(selectedObj))
-            painter.drawEllipse(QRect(selectedObj->getx() - selectedObj->getwidth()/2, selectedObj->getz() - selectedObj->getheight()/2, selectedObj->getwidth(), selectedObj->getheight()));
-        else
-            painter.drawRect(QRect(selectedObj->getx() + selectedObj->getoffsetx(), selectedObj->getz() + selectedObj->getoffsetz(), selectedObj->getwidth(), selectedObj->getheight()));
+        if (mode == 0)
+        {
+            if (is<Node*>(selectedObj))
+                painter.drawEllipse(QRect(selectedObj->getx() - selectedObj->getwidth()/2, selectedObj->getz() - selectedObj->getheight()/2, selectedObj->getwidth(), selectedObj->getheight()));
+            else
+                painter.drawRect(QRect(selectedObj->getx() + selectedObj->getoffsetx(), selectedObj->getz() + selectedObj->getoffsetz(), selectedObj->getwidth(), selectedObj->getheight()));
+        }
     }
 }
 
@@ -330,66 +341,75 @@ void MapView::mousePressEvent(QMouseEvent* evt)
         {
             selected = false;
 
-            for (int i = map->towersCastles.length()-1; i >= 0; i--)
+            if (mode == 0)
             {
-                MapObject* o = map->towersCastles.at(i);
-                if (o->clickDetection(mouseX, mouseY))
+                if (!selected) for (int i = map->towersCastles.length()-1; i >= 0; i--)
                 {
-                    selectedObj = o;
-                    selected = true;
-                    emit changeSelectedMapObj(o);
-                    break;
+                    MapObject* o = map->towersCastles.at(i);
+                    if (o->clickDetection(mouseX, mouseY))
+                    {
+                        selectedObj = o;
+                        selected = true;
+                        emit changeSelectedMapObj(o);
+                        break;
+                    }
                 }
-            }
 
-            if (!selected) for (int i = map->mushroomHouses.length()-1; i >= 0; i--)
-            {
-                MapObject* o = map->mushroomHouses.at(i);
-                if (o->clickDetection(mouseX, mouseY))
+                if (!selected) for (int i = map->mushroomHouses.length()-1; i >= 0; i--)
                 {
-                    selectedObj = o;
-                    selected = true;
-                    emit changeSelectedMapObj(o);
-                    break;
+                    MapObject* o = map->mushroomHouses.at(i);
+                    if (o->clickDetection(mouseX, mouseY))
+                    {
+                        selectedObj = o;
+                        selected = true;
+                        emit changeSelectedMapObj(o);
+                        break;
+                    }
                 }
-            }
 
-            if (!selected) for (int i = map->starCoinSigns.length()-1; i >= 0; i--)
-            {
-                MapObject* o = map->starCoinSigns.at(i);
-                if (o->clickDetection(mouseX, mouseY))
+                if (!selected) for (int i = map->starCoinSigns.length()-1; i >= 0; i--)
                 {
-                    selectedObj = o;
-                    selected = true;
-                    emit changeSelectedMapObj(o);
-                    break;
+                    MapObject* o = map->starCoinSigns.at(i);
+                    if (o->clickDetection(mouseX, mouseY))
+                    {
+                        selectedObj = o;
+                        selected = true;
+                        emit changeSelectedMapObj(o);
+                        break;
+                    }
                 }
-            }
 
-            if (!selected) for (int i = map->nodes.length()-1; i >= 0; i--)
-            {
-                Node* n = map->getNodePtr(i);
-                if (n->clickDetection(mouseX, mouseY))
+                if (!selected) for (int i = map->nodes.length()-1; i >= 0; i--)
                 {
-                    selectedObj = n;
-                    selected = true;
-                    emit changeSelectedNode(n);
-                    break;
+                    Node* n = map->getNodePtr(i);
+                    if (n->clickDetection(mouseX, mouseY))
+                    {
+                        selectedObj = n;
+                        selected = true;
+                        emit changeSelectedNode(n);
+                        break;
+                    }
                 }
             }
 
             if (selected)
             {
-                if (!is<Node*>(selectedObj))
-                    emit changeDeselectedNode();
+                if (mode == 0)
+                {
+                    if (!is<Node*>(selectedObj))
+                        emit changeDeselectedNode();
 
-                if (!is<MapObject*>(selectedObj))
-                    emit changeDeselectedMapObj();
+                    if (!is<MapObject*>(selectedObj))
+                        emit changeDeselectedMapObj();
+                }
             }
             else
             {
-                emit changeDeselectedNode();
-                emit changeDeselectedMapObj();
+                if (mode == 0)
+                {
+                    emit changeDeselectedNode();
+                    emit changeDeselectedMapObj();
+                }
             }
         }
         repaint();

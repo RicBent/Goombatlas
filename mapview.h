@@ -14,6 +14,8 @@ public:
 
     void setMap(Map* map);
 
+    void setMode(int mode);
+
     float getZoom() { return zoom; }
     void setZoom(float zoom);
     void zoomIn();
@@ -53,6 +55,8 @@ protected:
 
 private:
     Map* map;
+
+    int mode;
 
     MovableObject* selectedObj;
     bool selected;

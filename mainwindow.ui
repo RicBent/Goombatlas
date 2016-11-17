@@ -73,6 +73,28 @@
    <addaction name="menuView"/>
    <addaction name="menuWindow"/>
   </widget>
+  <widget class="QToolBar" name="toolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionModePlaceholder"/>
+   <addaction name="separator"/>
+   <addaction name="actionNew"/>
+   <addaction name="actionOpen"/>
+   <addaction name="actionSave"/>
+   <addaction name="separator"/>
+   <addaction name="actionZoomOut"/>
+   <addaction name="actionZoom100"/>
+   <addaction name="actionZoomIn"/>
+   <addaction name="separator"/>
+   <addaction name="actionExportC"/>
+  </widget>
   <action name="actionNew">
    <property name="text">
     <string>New</string>
@@ -186,6 +208,11 @@
    </property>
    <property name="toolTip">
     <string>Export to Code</string>
+   </property>
+  </action>
+  <action name="actionModePlaceholder">
+   <property name="text">
+    <string>modePlaceholder</string>
    </property>
   </action>
  </widget>
