@@ -40,6 +40,8 @@ Map::Map(QFile* file)
                 readMapObjects(&xmlReader, 2);
             else if (xmlReader.name() == "sprites")
                 readSprites(&xmlReader);
+            else if (xmlReader.name() == "animationPaths")
+                readAnimationPaths(&xmlReader);
             else
                 xmlReader.readNext();
         }
@@ -57,6 +59,15 @@ Map::~Map()
 
     foreach (PathBehavior* p, pathBehaviors)
         delete p;
+
+    foreach (MapObject* o, starCoinSigns)
+        delete o;
+
+    foreach (MapObject* o, towersCastles)
+        delete o;
+
+    foreach (MapObject* o, mushroomHouses)
+        delete o;
 }
 
 void Map::readNodes(QXmlStreamReader* xmlReader)
@@ -150,6 +161,24 @@ void Map::readSprites(QXmlStreamReader* xmlReader)
     }
 }
 
+void Map::readAnimationPaths(QXmlStreamReader* xmlReader)
+{
+    while (!xmlReader->atEnd())
+    {
+        if(xmlReader->isEndElement())
+        {
+            xmlReader->readNext();
+            break;
+        }
+        else if(xmlReader->isStartElement())
+        {
+            if (xmlReader->name() == "animationPath")
+                animationpaths.append(new AnimationPath(xmlReader));
+        }
+        xmlReader->readNext();
+    }
+}
+
 bool Map::save(QWidget* parent, QString path)
 {
     if (path.isEmpty() || path.isEmpty())
@@ -200,6 +229,11 @@ bool Map::save(QWidget* parent, QString path)
             xmlWriter.writeTextElement("sprite1StartNode", QString::number(sprite1StartNode));
             xmlWriter.writeTextElement("sprite2Type", QString::number(sprite2Type));
             xmlWriter.writeTextElement("sprite2StartNode", QString::number(sprite2StartNode));
+        xmlWriter.writeEndElement();
+
+        xmlWriter.writeStartElement("mationmationPaths");
+        foreach (AnimationPath* p, animationpaths)
+            p->writeXml(&xmlWriter);
         xmlWriter.writeEndElement();
 
 

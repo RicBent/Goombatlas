@@ -21,6 +21,8 @@ public:
     QList<MapObject*> towersCastles;
     QList<MapObject*> mushroomHouses;
 
+    QList<AnimationPath*> animationpaths;
+
     quint8 sprite1Type;
     quint8 sprite1StartNode;
     quint8 sprite2Type;
@@ -47,6 +49,7 @@ private:
     void readPathSettings(QXmlStreamReader* xmlReader);
     void readMapObjects(QXmlStreamReader* xmlReader, quint8 type);
     void readSprites(QXmlStreamReader* xmlReader);
+    void readAnimationPaths(QXmlStreamReader* xmlReader);
 
     QString hex(uint addr);
 };

@@ -154,4 +154,45 @@ private:
     quint8 nodeId;
 };
 
+
+// Keyframe
+
+class Keyframe: public MovableObject
+{
+public:
+    Keyframe();
+    Keyframe(QXmlStreamReader* xmlReader);
+
+    void writeXml(QXmlStreamWriter* xmlWriter);
+
+    qint32 getRot() { return rot; }
+    quint32 getPace() { return pace; }
+
+    void setRot(qint32 rot) { this->rot = rot; }
+    void setPace(quint32 pace) { this->pace = pace; }
+
+private:
+    void clearValues();
+
+    qint32 rot;
+    quint32 pace;
+};
+
+
+// Animation Path
+
+class AnimationPath
+{
+public:
+    AnimationPath();
+    AnimationPath(QXmlStreamReader* xmlReader);
+    ~AnimationPath();
+
+    void writeXml(QXmlStreamWriter* xmlWriter);
+
+    QList<Keyframe*>* keyframeList() { return &keyframes; }
+
+private:
+    QList<Keyframe*> keyframes;
+};
 #endif // MAPOBJECTS_H

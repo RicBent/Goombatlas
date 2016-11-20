@@ -126,6 +126,27 @@ MainWindow::MainWindow(QWidget *parent) :
     modes[0].addDock(spritesEditorDock);
 
 
+    ui->menuWindow->addSeparator();
+
+
+    // Setup Animations Editor
+
+    animationsEditor = new AnimationsEditor(map, mapView, this);
+    connect(animationsEditor, SIGNAL(redrawMap()), mapView, SLOT(repaint()));
+    connect(mapView, SIGNAL(changeSelectedKeyframe(Keyframe*)), animationsEditor, SLOT(kSelect(Keyframe*)));
+    connect(mapView, SIGNAL(changeDeselectedKeyframe()), animationsEditor, SLOT(kDeselect()));
+    connect(animationsEditor, SIGNAL(keyframeSelected(MovableObject*)), mapView, SLOT(select(MovableObject*)));
+    connect(animationsEditor, SIGNAL(keyframeDeselected()), mapView, SLOT(deselect()));
+
+    QDockWidget* animationsEditorDock = new QDockWidget("Path Animations Editor", this);
+    animationsEditorDock->setWidget(animationsEditor);
+
+    addDockWidget(Qt::LeftDockWidgetArea, animationsEditorDock);
+    animationsEditorDock->toggleViewAction()->setShortcut(QKeySequence("Ctrl+1"));
+    animationsEditorDock->toggleViewAction()->setIcon(QIcon(iconsPath + "walk.png"));
+    ui->menuWindow->addAction(animationsEditorDock->toggleViewAction());
+    modes[1].addDock(animationsEditorDock);
+
     // Update Mode Selector
     for (int i = 0; i < modes.length(); i++)
     {
@@ -157,6 +178,13 @@ void MainWindow::onLoad()
     mapScrollTo(0, 0);
 }
 
+QMenu* MainWindow::createPopupMenu()
+{
+    QMenu* filteredMenu = QMainWindow::createPopupMenu();
+    filteredMenu->removeAction(ui->toolBar->toggleViewAction());
+    return filteredMenu;
+}
+
 void MainWindow::modeChanged(int modeIndex)
 {
     for (int i = 0; i < modes.length(); i++)
@@ -180,6 +208,7 @@ void MainWindow::updateMap(QFile* file)
     pathBehaviorEditor->setMap(map);
     mapObjectEditor->setMap(map);
     spritesEditor->setMap(map);
+    animationsEditor->setMap(map);
 }
 
 

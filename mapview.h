@@ -15,6 +15,7 @@ public:
     void setMap(Map* map);
 
     void setMode(int mode);
+    void setCurrentAnimPath(int animPath);
 
     float getZoom() { return zoom; }
     void setZoom(float zoom);
@@ -42,6 +43,9 @@ signals:
     void changeSelectedMapObj(MapObject* mapObj);
     void changeDeselectedMapObj();
 
+    void changeSelectedKeyframe(Keyframe* keyframe);
+    void changeDeselectedKeyframe();
+
 public slots:
     void viewAreaResized(QResizeEvent* evt);
     void select(MovableObject* obj);
@@ -61,6 +65,8 @@ private:
     MovableObject* selectedObj;
     bool selected;
 
+    int currentAnimPath;
+
     bool drag;
     int dragX, dragY;
     int lastX, lastY;
@@ -75,6 +81,10 @@ private:
     int centerY;
 
     int roundDown(int num, int factor);
+
+    QPolygon keyframeShape;
+    QPainterPath keyframeShapeL;
+    QPainterPath keyframeShapeR;
 
     QPoint tempPos;
 

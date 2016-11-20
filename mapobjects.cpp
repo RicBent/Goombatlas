@@ -363,3 +363,99 @@ void MapObject::writeXml(QXmlStreamWriter* xmlWriter)
     xmlWriter->writeTextElement("z", QString::number(z));
     xmlWriter->writeEndElement();
 }
+
+
+Keyframe::Keyframe()
+{
+    clearValues();
+}
+
+Keyframe::Keyframe(QXmlStreamReader* xmlReader)
+{
+    clearValues();
+
+    while (!xmlReader->atEnd())
+    {
+        if(xmlReader->isEndElement())
+        {
+            xmlReader->readNext();
+            break;
+        }
+        else if(xmlReader->isStartElement())
+        {
+            if (xmlReader->name() == "x")
+                x = xmlReader->readElementText().toInt();
+            else if (xmlReader->name() == "y")
+                y = xmlReader->readElementText().toInt();
+            else if (xmlReader->name() == "z")
+                z = xmlReader->readElementText().toInt();
+            else if (xmlReader->name() == "rot")
+                rot = xmlReader->readElementText().toInt();
+            else if (xmlReader->name() == "pace")
+                pace = xmlReader->readElementText().toInt();
+        }
+        xmlReader->readNext();
+    }
+}
+
+void Keyframe::clearValues()
+{
+    x = 0;
+    y = 0;
+    z = 0;
+    rot = 0;
+    pace = 25;
+    offsetx = -8;
+    offsetz = -8;
+    width = 16;
+    height = 16;
+}
+
+void Keyframe::writeXml(QXmlStreamWriter* xmlWriter)
+{
+    xmlWriter->writeStartElement("keyframe");
+    xmlWriter->writeTextElement("x", QString::number(x));
+    xmlWriter->writeTextElement("y", QString::number(y));
+    xmlWriter->writeTextElement("z", QString::number(z));
+    xmlWriter->writeTextElement("rot", QString::number(rot));
+    xmlWriter->writeTextElement("pace", QString::number(pace));
+    xmlWriter->writeEndElement();
+}
+
+
+AnimationPath::AnimationPath()
+{
+
+}
+
+AnimationPath::AnimationPath(QXmlStreamReader* xmlReader)
+{
+    while (!xmlReader->atEnd())
+    {
+        if(xmlReader->isEndElement())
+        {
+            xmlReader->readNext();
+            break;
+        }
+        else if(xmlReader->isStartElement())
+        {
+            if (xmlReader->name() == "keyframe")
+                keyframes.append(new Keyframe(xmlReader));
+        }
+        xmlReader->readNext();
+    }
+}
+
+AnimationPath::~AnimationPath()
+{
+    foreach (Keyframe* k, keyframes)
+        delete k;
+}
+
+void AnimationPath::writeXml(QXmlStreamWriter* xmlWriter)
+{
+    xmlWriter->writeStartElement("animationPath");
+    foreach (Keyframe* k, keyframes)
+        k->writeXml(xmlWriter);
+    xmlWriter->writeEndElement();
+}

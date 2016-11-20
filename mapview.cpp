@@ -13,9 +13,24 @@ MapView::MapView(QWidget *parent, Map *map) : QWidget(parent)
     gridSize = 64;
     selected = false;
     drag = false;
+    currentAnimPath = -1;
 
     centerX = 1600;
     centerY = 1600;
+
+
+    keyframeShape << QPoint(0, -8)
+                  << QPoint(8, 0)
+                  << QPoint(0, 8)
+                  << QPoint(-8, 0);
+
+    QPolygon keyframeShapeL_p;
+    keyframeShapeL_p << keyframeShape.at(0) << keyframeShape.at(2) << keyframeShape.at(3);
+    keyframeShapeL.addPolygon(keyframeShapeL_p);
+
+    QPolygon keyframeShapeR_p;
+    keyframeShapeR_p << keyframeShape.at(0) << keyframeShape.at(2) << keyframeShape.at(1);
+    keyframeShapeR.addPolygon(keyframeShapeR_p);
 
     setZoom(2);
 }
@@ -29,6 +44,12 @@ void MapView::setMode(int mode)
 {
     this->mode = mode;
     selected = false;
+    repaint();
+}
+
+void MapView::setCurrentAnimPath(int animPath)
+{
+    this->currentAnimPath = animPath;
     repaint();
 }
 
@@ -139,6 +160,11 @@ void MapView::paintEvent(QPaintEvent* evt)
     QPen pathBackPen(QColor(0xFF, 0x88, 0));
     pathBackPen.setWidth(2);
 
+    bool drawBothDirections = true;
+
+    if (mode == 1)
+        drawBothDirections = false;
+
     foreach (Node* n1, map->nodes)
     {
         for (int i = 0; i < n1->pathList()->length(); i++)
@@ -159,9 +185,13 @@ void MapView::paintEvent(QPaintEvent* evt)
             if (p->settings & 0x40)
                 angle += M_PI;
 
-            int offset = 3;
-            if (p->settings & 0x40)
-                offset *= -1;
+            int offset = 0;
+            if (drawBothDirections)
+            {
+                offset = 3;
+                if (p->settings & 0x40)
+                    offset *= -1;
+            }
 
             QPointF start1 = start;
             start1.setY(start.y() - offset);
@@ -170,9 +200,9 @@ void MapView::paintEvent(QPaintEvent* evt)
             end1.setY(end.y() - offset);
             end1 = rotateArroundPoint(end1, end, angle);
 
-            if (p->settings & 0x40)
-                painter.setPen(pathPen);
-            else
+            painter.setPen(pathPen);
+
+            if (drawBothDirections && p->settings & 0x40)
                 painter.setPen(pathBackPen);
 
             painter.drawLine(start1, end1);
@@ -266,6 +296,35 @@ void MapView::paintEvent(QPaintEvent* evt)
     }
 
 
+    // Draw Keyframes
+
+    if (mode == 1 && currentAnimPath != -1 && currentAnimPath < map->animationpaths.length())
+    {
+        AnimationPath* p = map->animationpaths[currentAnimPath];
+
+        QPen animPathPen(QColor(0x00, 0x35, 0x35));
+        animPathPen.setWidth(2);
+        painter.setPen(animPathPen);
+
+        painter.setRenderHint(QPainter::Antialiasing);
+        for (int i = 1; i < p->keyframeList()->length(); i++)
+        {
+            Keyframe* lK = p->keyframeList()->at(i-1);
+            Keyframe* cK = p->keyframeList()->at(i);
+            painter.drawLine(QPoint(lK->getx(), lK->getz()), QPoint(cK->getx(), cK->getz()));
+        }
+        painter.setRenderHint(QPainter::Antialiasing, false);
+
+        for (int i = 0; i < p->keyframeList()->length(); i++)
+        {
+            Keyframe* k = p->keyframeList()->at(i);
+            painter.fillPath(keyframeShapeL.translated(k->getx(), k->getz()), QBrush(QColor(0x00, 0xAC, 0xC1)));
+            painter.fillPath(keyframeShapeR.translated(k->getx(), k->getz()), QBrush(QColor(0x0d, 0x82, 0x93)));
+            painter.setPen(Qt::black);
+            painter.drawPolygon(keyframeShape.translated(k->getx(), k->getz()));
+        }
+    }
+
     // Draw Selection
 
     QPen selPen(Qt::red);
@@ -280,6 +339,11 @@ void MapView::paintEvent(QPaintEvent* evt)
                 painter.drawEllipse(QRect(selectedObj->getx() - selectedObj->getwidth()/2, selectedObj->getz() - selectedObj->getheight()/2, selectedObj->getwidth(), selectedObj->getheight()));
             else
                 painter.drawRect(QRect(selectedObj->getx() + selectedObj->getoffsetx(), selectedObj->getz() + selectedObj->getoffsetz(), selectedObj->getwidth(), selectedObj->getheight()));
+        }
+        else if (mode == 1)
+        {
+            if (is<Keyframe*>(selectedObj))
+                painter.drawPolygon(keyframeShape.translated(selectedObj->getx(), selectedObj->getz()));
         }
     }
 }
@@ -392,6 +456,25 @@ void MapView::mousePressEvent(QMouseEvent* evt)
                 }
             }
 
+            else if (mode == 1)
+            {
+                if (!selected && currentAnimPath != -1 && currentAnimPath < map->animationpaths.length())
+                {
+                    for (int i = map->animationpaths[currentAnimPath]->keyframeList()->length()-1; i >= 0; i--)
+                    {
+                        Keyframe* k = map->animationpaths[currentAnimPath]->keyframeList()->at(i);
+                        if (k->clickDetection(mouseX, mouseY))
+                        {
+                            selectedObj = k;
+                            selected = true;
+                            emit changeSelectedKeyframe(k);
+                            break;
+                        }
+                    }
+                }
+            }
+
+
             if (selected)
             {
                 if (mode == 0)
@@ -410,22 +493,52 @@ void MapView::mousePressEvent(QMouseEvent* evt)
                     emit changeDeselectedNode();
                     emit changeDeselectedMapObj();
                 }
+                else if (mode == 1)
+                {
+                    emit changeDeselectedKeyframe();
+                }
             }
         }
         repaint();
     }
     else if (evt->button() == Qt::RightButton)
     {
-        Node* newNode = new Node(mouseX, 0, mouseY);
-        selectedObj = newNode;
-        dragX = newNode->getx();
-        dragY = newNode->getz();
-        lastX = mouseX;
-        lastY = mouseY;
-        drag = true;
-        map->addNode(newNode);
-        emit changeSelectedNode(newNode);
-        emit changeDeselectedMapObj();
+        if (mode == 0)
+        {
+            Node* newNode = new Node(mouseX, 0, mouseY);
+            selectedObj = newNode;
+            dragX = newNode->getx();
+            dragY = newNode->getz();
+            lastX = mouseX;
+            lastY = mouseY;
+            drag = true;
+            map->addNode(newNode);
+            emit changeSelectedNode(newNode);
+            emit changeDeselectedMapObj();
+        }
+        else if (mode == 1 && currentAnimPath != -1)
+        {
+            Keyframe* newKeyframe = new Keyframe();
+            newKeyframe->setx(mouseX);
+            newKeyframe->setz(mouseY);
+            dragX = newKeyframe->getx();
+            dragY = newKeyframe->getz();
+            lastX = mouseX;
+            lastY = mouseY;
+            drag = true;
+
+            if (!selected)
+                map->animationpaths[currentAnimPath]->keyframeList()->append(newKeyframe);
+            else
+            {
+                int insertAt = map->animationpaths[currentAnimPath]->keyframeList()->indexOf(dynamic_cast<Keyframe*>(selectedObj)) + 1;
+                qDebug() << "Insert at" << insertAt;
+                map->animationpaths[currentAnimPath]->keyframeList()->insert(insertAt, newKeyframe);
+            }
+
+            selectedObj = newKeyframe;
+            emit changeSelectedKeyframe(newKeyframe);
+        }
     }
 }
 
@@ -459,6 +572,8 @@ void MapView::mouseMoveEvent(QMouseEvent* evt)
             emit changeSelectedNode(dynamic_cast<Node*>(selectedObj));
         else if (is<MapObject*>(selectedObj))
             emit changeSelectedMapObj(dynamic_cast<MapObject*>(selectedObj));
+        else if (is<Keyframe*>(selectedObj))
+            emit changeSelectedKeyframe(dynamic_cast<Keyframe*>(selectedObj));
 
         repaint();
     }

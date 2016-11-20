@@ -12,7 +12,7 @@
 
 #include <QDebug>
 
-NodeEditorWidget::NodeEditorWidget(Map* map, MapView *mapView, QWidget* parent) : QWidget(parent)
+NodeEditorWidget::NodeEditorWidget(Map* map, MapView* mapView, QWidget* parent) : QWidget(parent)
 {
     this->map = map;
     this->mapView = mapView;
@@ -131,10 +131,6 @@ NodeEditorWidget::NodeEditorWidget(Map* map, MapView *mapView, QWidget* parent) 
     unknownBit = new QCheckBox("Unknown Bit 7", this);
     connect(unknownBit, SIGNAL(toggled(bool)), this, SLOT(unknownBitToggled(bool)));
     editsLayout->addWidget(unknownBit, 10, 1, 1, 2);
-
-    /*QWidget* spacer = new QWidget(this);
-    spacer->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Expanding);
-    editsLayout->addWidget(spacer, 11, 0, 1, 3);*/
 
 
     QVBoxLayout* pathsLayout = new QVBoxLayout();
@@ -300,6 +296,7 @@ NodeEditorWidget::NodeEditorWidget(Map* map, MapView *mapView, QWidget* parent) 
     clearValues();
     updateList();
     pSetEditsEnabled(false);
+    pButtonsBar->setEnabled(false);
     pClearValues();
 }
 
@@ -336,6 +333,7 @@ void NodeEditorWidget::deselect()
 
     pathList->clear();
     pDeselect();
+    pButtonsBar->setEnabled(false);
 }
 
 void NodeEditorWidget::_deselect()
@@ -535,6 +533,9 @@ void NodeEditorWidget::pDeselect()
 {
     pSetEditsEnabled(false);
     pClearValues();
+    pathList->blockSignals(true);
+    pathList->selectionModel()->clear();
+    pathList->blockSignals(false);
 }
 
 void NodeEditorWidget::pUpdateList(bool keepIndex)
@@ -561,7 +562,6 @@ void NodeEditorWidget::pSetEditsEnabled(bool enabled)
     pathSettingId->setEnabled(enabled);
     direction->setEnabled(enabled);
     reversePathAnim->setEnabled(enabled);
-    pButtonsBar->setEnabled(enabled);
 }
 
 void NodeEditorWidget::pUpdateInfo()

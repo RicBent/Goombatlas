@@ -7,6 +7,7 @@
 #include "pathbehavioreditor.h"
 #include "mapobjecteditor.h"
 #include "spriteseditor.h"
+#include "animationseditor.h"
 
 #include <QMainWindow>
 #include <QCoreApplication>
@@ -15,6 +16,7 @@
 #include <QResizeEvent>
 #include <QDockWidget>
 #include <QComboBox>
+#include <QMenu>
 
 namespace Ui {
 class MainWindow;
@@ -43,6 +45,9 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
+
+protected:
+    QMenu* createPopupMenu() Q_DECL_OVERRIDE;
 
 private slots:
 
@@ -93,6 +98,7 @@ private:
     PathBehaviorEditor* pathBehaviorEditor;
     MapObjectEditor* mapObjectEditor;
     SpritesEditor* spritesEditor;
+    AnimationsEditor* animationsEditor;
 
     void updateMap(QFile* file=NULL);
     void setMapName(QString mapName="Untitled Map");

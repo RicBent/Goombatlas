@@ -23,7 +23,8 @@ SOURCES += main.cpp\
     exportmapdialog.cpp \
     mapobjecteditor.cpp \
     spriteseditor.cpp \
-    mode.cpp
+    mode.cpp \
+    animationseditor.cpp
 
 HEADERS  += mainwindow.h \
     mapview.h \
@@ -36,7 +37,8 @@ HEADERS  += mainwindow.h \
     mapobjecteditor.h \
     misc.h \
     spriteseditor.h \
-    mode.h
+    mode.h \
+    animationseditor.h
 
 FORMS    += mainwindow.ui \
     exportmapdialog.ui
